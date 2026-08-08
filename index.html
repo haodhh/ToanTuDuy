@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#ff9800" />
+  <title>Toán Tư Duy cùng Gấu KIKI</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐼</text></svg>" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- MÀN HÌNH CHÍNH -->
+  <div id="screen-menu" class="screen active">
+    <header class="app-header">
+      <div class="mascot-wrap" id="menuMascot"></div>
+      <div class="title-wrap">
+        <h1>Toán Tư Duy</h1>
+        <p>cùng Gấu KIKI 🐼</p>
+      </div>
+      <button class="sound-toggle" id="soundToggle" title="Bật/tắt âm thanh">🔊</button>
+    </header>
+
+    <main id="menuBody" class="menu-body">
+      <!-- các thẻ bài học được sinh bằng JS -->
+    </main>
+
+    <footer class="app-footer">
+      <span>Dựa theo sách <b>“Phiếu luyện Toán tư duy cùng Gấu KIKI 3”</b> — Bé chơi lại bao nhiêu lần cũng được! 💛</span>
+    </footer>
+  </div>
+
+  <!-- MÀN HÌNH CHƠI -->
+  <div id="screen-play" class="screen">
+    <header class="play-header">
+      <button class="btn-back" id="btnBack" aria-label="Quay lại">‹</button>
+      <div class="play-title" id="playTitle">Bài học</div>
+      <button class="btn-repeat" id="btnSpeak" aria-label="Đọc lại">🔁</button>
+    </header>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="stars-row" id="starsRow"></div>
+    <main class="play-body" id="playBody"></main>
+    <div class="feedback-layer" id="feedback"></div>
+  </div>
+
+  <script src="js/engine.js"></script>
+  <script src="js/art.js"></script>
+  <script src="js/lessons.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
