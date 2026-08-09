@@ -17,27 +17,29 @@ const VOL_T5 = (() => {
   // cộng có hình minh hoạ
   const addObj = (code, a, b, e) => ({
     type: 'mc', cols: 4, prompt: code + ' Đếm rồi tính kết quả.',
+    say: `${code} Đếm rồi tính. ${a} cộng ${b} bằng mấy?`,
     sceneHTML: `<div class="calc"><span class="grp">${rep(e, a)}</span><span class="op">+</span><span class="grp">${rep(e, b)}</span><span class="op">=</span><span class="q">?</span></div>`,
     options: numOpts(a + b),
   });
   // trừ có hình minh hoạ (gạch bớt b vật)
   const subObj = (code, a, b, e) => ({
     type: 'mc', cols: 4, prompt: code + ' Đếm rồi tính kết quả.',
+    say: `${code} Đếm rồi tính. ${a} trừ ${b} bằng mấy?`,
     sceneHTML: `<div class="calc"><span class="grp">${Array.from({ length: a }, (_, i) => `<span style="${i >= a - b ? 'opacity:.28;text-decoration:line-through 3px #e53935' : ''}">${e}</span>`).join('')}</span><span class="op">−</span><b>${b}</b><span class="op">=</span><span class="q">?</span></div>`,
     options: numOpts(a - b),
   });
   // phép tính bằng số
   const calc = (code, a, op, b) => {
     const ans = op === '+' ? a + b : a - b;
-    return { type: 'mc', cols: 4, prompt: code + ' Tính kết quả.', sceneHTML: `<div class="calc"><b style="font-size:44px">${a} ${op === '+' ? '+' : '−'} ${b} = ?</b></div>`, options: numOpts(ans) };
+    return { type: 'mc', cols: 4, prompt: code + ' Tính kết quả.', say: `${code} Tính. ${a} ${op === '+' ? 'cộng' : 'trừ'} ${b} bằng mấy?`, sceneHTML: `<div class="calc"><b style="font-size:44px">${a} ${op === '+' ? '+' : '−'} ${b} = ?</b></div>`, options: numOpts(ans) };
   };
   // phép tính cột dọc
   const col = (code, a, op, b) => {
     const ans = op === '+' ? a + b : a - b;
-    return { type: 'mc', cols: 4, prompt: code + ' Tính theo cột dọc.', sceneHTML: `<div style="display:flex;justify-content:center"><div class="calc-col"><div>${a}</div><div class="op-row"><span style="color:#f57c00">${op === '+' ? '+' : '−'}</span><span>${b}</span></div><div class="bar"></div><div class="q" style="color:#f57c00">?</div></div></div>`, options: numOpts(ans) };
+    return { type: 'mc', cols: 4, prompt: code + ' Tính theo cột dọc.', say: `${code} Tính theo cột dọc. ${a} ${op === '+' ? 'cộng' : 'trừ'} ${b} bằng mấy?`, sceneHTML: `<div style="display:flex;justify-content:center"><div class="calc-col"><div>${a}</div><div class="op-row"><span style="color:#f57c00">${op === '+' ? '+' : '−'}</span><span>${b}</span></div><div class="bar"></div><div class="q" style="color:#f57c00">?</div></div></div>`, options: numOpts(ans) };
   };
   // điền số còn thiếu: a + ? = c  (trò chơi ô số)
-  const fillAdd = (code, a, c) => ({ type: 'mc', cols: 4, prompt: `${code} ${a} + ? = ${c}. Số cần điền là?`, options: numOpts(c - a) });
+  const fillAdd = (code, a, c) => ({ type: 'mc', cols: 4, prompt: `${code} ${a} + ? = ${c}. Số cần điền là?`, say: `${code} ${a} cộng mấy bằng ${c}? Số cần điền là mấy?`, options: numOpts(c - a) });
 
   function b1() { return [ // cộng ≤3
     addObj('Bài 1.', 1, 1, '🍎'), addObj('Bài 1.', 1, 2, '🫐'), addObj('Bài 1.', 2, 1, '🍑'),

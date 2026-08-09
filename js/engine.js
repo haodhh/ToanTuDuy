@@ -45,23 +45,90 @@ const Game = (() => {
     click() { tone(700, .05, 'square', 0, .08); }
   };
 
-  /* ---------- giọng đọc tiếng Việt ---------- */
+  /* ---------- giọng đọc tiếng Việt ----------
+     Ưu tiên giọng Google Dịch (chuẩn phát âm tiếng Việt hơn giọng máy).
+     Nếu không tải được (mất mạng / bị chặn) sẽ tự chuyển sang giọng có sẵn
+     của thiết bị. Mọi câu đọc đều được chuẩn hoá về TIẾNG VIỆT: bỏ emoji &
+     thẻ HTML, đổi ký hiệu toán ( + − = → ? ) thành chữ, tránh đọc lẫn tiếng Anh. */
   let viVoice = null;
   function loadVoices() {
     if (!('speechSynthesis' in window)) return;
     const vs = speechSynthesis.getVoices();
-    viVoice = vs.find(v => /vi[-_]?VN/i.test(v.lang) || /vietnam/i.test(v.name)) || null;
+    const vi = vs.filter(v => /vi[-_]?VN/i.test(v.lang) || /vietnam/i.test(v.name));
+    // ưu tiên giọng "Google Tiếng Việt" (chính là giọng Google Dịch trên Chrome/Android)
+    viVoice = vi.find(v => /google/i.test(v.name)) || vi[0] || null;
   }
   if ('speechSynthesis' in window) { loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
-  function speak(text) {
-    if (!soundOn || !('speechSynthesis' in window) || !text) return;
+
+  // Chuẩn hoá văn bản trước khi đọc -> chỉ còn tiếng Việt, không còn ký hiệu/emoji
+  function sayText(t) {
+    if (t == null) return '';
+    let s = String(t)
+      .replace(/<[^>]+>/g, ' ')                         // bỏ thẻ HTML
+      .replace(/[❓❔]/g, ' hỏi ')                        // dấu hỏi minh hoạ -> "hỏi"
+      .replace(/\s*[→➜➡►▶⟶]\s*/g, ' đến ')              // mũi tên "1→6" -> "1 đến 6"
+      .replace(/\s*↔\s*/g, ' và ')
+      .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{2190}-\u{21FF}\u{FE0F}\u{200D}\u{1F3FB}-\u{1F3FF}]/gu, ' ') // bỏ emoji còn lại
+      .replace(/\s*\+\s*/g, ' cộng ')                   // dấu cộng
+      .replace(/\s*×\s*(?=\d)/g, ' nhân ')              // dấu nhân
+      .replace(/(?<=\d)\s*[−–—-]\s*(?=\d)/g, ' trừ ')   // dấu trừ giữa hai số
+      .replace(/\s*=\s*/g, ' bằng ');                   // dấu bằng
+    s = s.split(/\s+/).map(w => (w === '?' ? 'mấy' : w)).filter(Boolean).join(' ');
+    s = s.replace(/\s+([.,;:!?)])/g, '$1').replace(/([(])\s+/g, '$1'); // bỏ khoảng trắng thừa quanh dấu câu
+    return s.trim();
+  }
+
+  let curAudio = null;   // audio Google TTS đang phát
+  let sayTok = 0;        // token để huỷ chuỗi đọc cũ khi sang câu mới
+  function stopSpeak() {
+    sayTok++;
+    if (curAudio) { try { curAudio.pause(); curAudio.src = ''; } catch (e) { } curAudio = null; }
+    if ('speechSynthesis' in window) { try { speechSynthesis.cancel(); } catch (e) { } }
+  }
+  // Google TTS giới hạn ~200 ký tự/lần -> cắt câu dài thành nhiều đoạn
+  function ttsChunks(s) {
+    const words = s.split(/\s+/), out = []; let cur = '';
+    for (const w of words) {
+      if (cur && (cur + ' ' + w).length > 180) { out.push(cur); cur = w; }
+      else cur = cur ? cur + ' ' + w : w;
+    }
+    if (cur) out.push(cur);
+    return out.length ? out : [s];
+  }
+  const gttsUrl = (chunk) =>
+    'https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=vi&q=' + encodeURIComponent(chunk);
+  function speakLocal(text) {   // dự phòng: giọng có sẵn của thiết bị
+    if (!('speechSynthesis' in window) || !text) return;
     try {
-      speechSynthesis.cancel();
       const u = new SpeechSynthesisUtterance(text);
-      u.lang = 'vi-VN'; u.rate = 0.92; u.pitch = 1.08;
+      u.lang = 'vi-VN'; u.rate = 0.92; u.pitch = 1.06;
       if (viVoice) u.voice = viVoice;
       speechSynthesis.speak(u);
     } catch (e) { }
+  }
+  function speak(text) {
+    if (!soundOn) return;
+    const clean = sayText(text);
+    if (!clean) return;
+    stopSpeak();
+    const tok = sayTok, parts = ttsChunks(clean);
+    let i = 0, fellBack = false;
+    function fallback() {
+      if (fellBack || tok !== sayTok) return;
+      fellBack = true; curAudio = null;
+      speakLocal(parts.slice(i).join(' '));   // đọc nốt phần còn lại bằng giọng máy
+    }
+    function next() {
+      if (tok !== sayTok) return;
+      if (i >= parts.length) { curAudio = null; return; }
+      const a = new Audio(gttsUrl(parts[i]));
+      curAudio = a;
+      a.onended = () => { if (tok === sayTok) { i++; next(); } };
+      a.onerror = fallback;
+      const p = a.play();
+      if (p && p.catch) p.catch(fallback);    // autoplay bị chặn -> dùng giọng máy
+    }
+    next();
   }
 
   /* ---------- hình SVG (cho quy luật màu sắc / hình khối) ---------- */
@@ -222,17 +289,18 @@ const Game = (() => {
     const q = s.questions[s.idx];
     const body = $('playBody'); body.innerHTML = '';
 
-    // câu dẫn (có nút loa)
+    // câu dẫn (có nút loa). q.say (nếu có) = câu đọc riêng, dễ nghe hơn q.prompt
+    const spoken = q.say != null ? q.say : q.prompt;
+    s.spoken = spoken;
     const p = el('div', 'prompt');
     p.innerHTML = `<span>${q.prompt}</span><span class="say" title="Nghe">🔊</span>`;
-    p.querySelector('.say').onclick = () => speak(stripEmoji(q.prompt));
+    p.querySelector('.say').onclick = () => speak(spoken);
     body.appendChild(p);
-    speak(stripEmoji(q.prompt));
+    speak(spoken);
 
     const host = el('div'); host.style.flex = '1'; body.appendChild(host);
     RENDERERS[q.type](q, host);
   }
-  const stripEmoji = (t) => t.replace(/<[^>]+>/g, '').replace(/[\p{Emoji_Presentation}☀-➿✕✓]/gu, '').replace(/\s+/g, ' ').trim();
 
   // gọi khi trả lời xong 1 câu
   function answered(ok) {
@@ -281,10 +349,14 @@ const Game = (() => {
     c.querySelector('.home').onclick = () => { sfx.click(); s.onExit('home'); };
   }
 
-  /* ---------- lưu số sao ---------- */
+  /* ---------- lưu số sao (qua Store: theo từng hồ sơ bé) ---------- */
   const SKEY = 'kiki_stars_v1';
-  function loadAllStars() { try { return JSON.parse(localStorage.getItem(SKEY) || '{}'); } catch (e) { return {}; } }
+  function loadAllStars() {
+    if (window.Store) return Store.getStars();
+    try { return JSON.parse(localStorage.getItem(SKEY) || '{}'); } catch (e) { return {}; }
+  }
   function saveStars(id, stars) {
+    if (window.Store) { Store.setStar(id, stars); return; }
     const all = loadAllStars();
     if (!all[id] || stars > all[id]) { all[id] = stars; try { localStorage.setItem(SKEY, JSON.stringify(all)); } catch (e) { } }
   }
@@ -695,9 +767,10 @@ const Game = (() => {
     // điều khiển
     startSession, pandaSVG, glyph, Scenes,
     loadAllStars,
-    setSound(on) { soundOn = on; if (!on && 'speechSynthesis' in window) speechSynthesis.cancel(); },
+    setSound(on) { soundOn = on; if (!on) stopSpeak(); },
     getSound() { return soundOn; },
-    speak, sfx,
+    speak, stopSpeak, sfx,
+    replay() { if (session && session.spoken != null) speak(session.spoken); },
     _answered: answered
   };
 })();

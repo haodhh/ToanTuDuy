@@ -18,6 +18,10 @@
         <h1>Toán Tư Duy</h1>
         <p>cùng Gấu KIKI 🐼</p>
       </div>
+      <button class="profile-btn" id="profileBtn" title="Hồ sơ học tập" aria-label="Hồ sơ học tập">
+        <span class="pf-emoji" id="pfEmoji">🐼</span>
+        <span class="pf-name" id="pfName">Bé yêu</span>
+      </button>
       <button class="sound-toggle" id="soundToggle" title="Bật/tắt âm thanh">🔊</button>
     </header>
 
@@ -50,6 +54,13 @@
     <div class="feedback-layer" id="feedback"></div>
   </div>
 
+  <!-- HỒ SƠ HỌC TẬP + SAO LƯU -->
+  <div class="modal-overlay" id="profileModal" hidden>
+    <div class="modal-card" id="profileCard"></div>
+  </div>
+  <input type="file" id="importFile" accept="application/json,.json" hidden />
+
+  <script src="js/store.js"></script>
   <script src="js/engine.js"></script>
   <script src="js/art.js"></script>
   <script src="js/lessons-t1.js"></script>
