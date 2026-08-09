@@ -14,8 +14,17 @@
     math: { volumes: MATH_VOLUMES, sidebarTitle: '📚 Chọn tập sách', subtitle: 'Toán tư duy cùng Gấu KIKI 🐼' },
     en: { volumes: EN_VOLUMES, sidebarTitle: '🎒 Chọn lớp học', subtitle: 'Tiếng Anh cho bé theo từng lớp 🔤' }
   };
-  let currentSubject = 'math';
+  // Nhớ TAB đang chọn (Toán / Tiếng Anh) để refresh không bị đổi tab.
+  // Mở lần đầu (chưa lưu gì) -> mặc định "Toán tư duy".
+  const SUBJECT_KEY = 'kiki_subject';
+  function savedSubject() {
+    try { const s = localStorage.getItem(SUBJECT_KEY); return (s === 'en' || s === 'math') ? s : 'math'; }
+    catch (e) { return 'math'; }
+  }
+  function saveSubject(s) { try { localStorage.setItem(SUBJECT_KEY, s); } catch (e) { } }
+  let currentSubject = savedSubject();
   const subjectVolumes = () => SUBJECTS[currentSubject].volumes;
+  if (!subjectVolumes().length) currentSubject = 'math';   // phòng khi môn đã lưu không có nội dung
 
   /* ---- PHẦN 3: ÔN TẬP (tự dựng cho mỗi tập) ----
      1) "Ôn tập bài đã học": lấy ngẫu nhiên 10 câu từ các bài ĐÃ HỌC (câu thật).
@@ -81,12 +90,13 @@
   }
   ALL_VOLUMES.forEach(addReviewPart);
 
-  // mở lại đúng tập/lớp bé đang học dở (nhận biết cả môn Toán và Tiếng Anh)
-  let currentVol = MATH_VOLUMES[0];
+  // Tab do người dùng chọn (đã lưu) quyết định môn; trong môn đó, mở lại đúng
+  // tập/lớp bé đang học dở NẾU nó thuộc môn đang chọn.
+  let currentVol = subjectVolumes()[0] || MATH_VOLUMES[0];
   const _last0 = Store.getLast();
   if (_last0) {
     const v = ALL_VOLUMES.find(x => x.id === _last0.vol);
-    if (v) { currentVol = v; currentSubject = EN_VOLUMES.indexOf(v) >= 0 ? 'en' : 'math'; }
+    if (v && (EN_VOLUMES.indexOf(v) >= 0 ? 'en' : 'math') === currentSubject) currentVol = v;
   }
 
   $('menuMascot').innerHTML = Game.pandaSVG();
@@ -142,6 +152,7 @@
   function setSubject(sub) {
     if (!SUBJECTS[sub] || sub === currentSubject) return;
     currentSubject = sub;
+    saveSubject(sub);          // nhớ tab để refresh không đổi tab
     currentVol = subjectVolumes()[0] || null;
     updateTabs();
     buildSidebar();
