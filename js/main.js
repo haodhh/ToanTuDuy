@@ -70,6 +70,7 @@
     return qs.slice(0, n);
   }
   function addReviewPart(vol) {
+    if (vol.noReview) return;   // volume "Ôn tập tổng hợp" tự nó không cần thêm phần ôn tập
     const base = vol.lessons.filter(l => l.part !== 3);
     if (!base.length) return;
     const maxNum = Math.max.apply(null, base.map(l => l.num));

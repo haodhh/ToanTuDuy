@@ -581,12 +581,14 @@ const Game = (() => {
 
     function drawLine(a, b) {
       const ar = a.getBoundingClientRect(), br = b.getBoundingClientRect(), pr = area.getBoundingClientRect();
-      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-      line.setAttribute('x1', ar.right - pr.left); line.setAttribute('y1', ar.top + ar.height / 2 - pr.top);
-      line.setAttribute('x2', br.left - pr.left); line.setAttribute('y2', br.top + br.height / 2 - pr.top);
-      line.setAttribute('stroke', pick(['#43a047', '#1e88e5', '#ec407a', '#fb8c00', '#8e24aa']));
-      line.setAttribute('stroke-width', '5'); line.setAttribute('stroke-linecap', 'round');
-      svg.appendChild(line);
+      const x1 = ar.right - pr.left, y1 = ar.top + ar.height / 2 - pr.top;
+      const x2 = br.left - pr.left, y2 = br.top + br.height / 2 - pr.top;
+      const col = pick(['#43a047', '#1e88e5', '#ec407a', '#fb8c00', '#8e24aa']);
+      const NS = 'http://www.w3.org/2000/svg';
+      const add = (tag, attrs) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); svg.appendChild(e); };
+      add('line', { x1, y1, x2, y2, stroke: col, 'stroke-width': 6, 'stroke-linecap': 'round' });
+      add('circle', { cx: x1, cy: y1, r: 6, fill: col });   // chấm tròn 2 đầu cho dễ nhìn
+      add('circle', { cx: x2, cy: y2, r: 6, fill: col });
     }
   };
 

@@ -1,10 +1,328 @@
 /* ================= DỮ LIỆU TIẾNG ANH (EN_CURRICULUM) =================
-   Chương trình tiếng Anh tiểu học (Lớp 1-5) bám sách của Bộ GD&ĐT
+   Chương trình tiếng Anh tiểu học (Mầm non + Lớp 1-5) bám sách của Bộ GD&ĐT
    (bộ Global Success — NXB Giáo dục Việt Nam). Mỗi lớp gồm nhiều unit
-   (chủ đề); mỗi item = { en, vi, emoji }. js/english.js dùng dữ liệu này
-   để tự sinh câu hỏi cho mỗi bài học.
+   (chủ đề); mỗi item = { en, vi, emoji }. Lớp 3-5 có thêm "phrases" (câu mẫu).
+   js/english.js dùng dữ liệu này để tự sinh câu hỏi cho mỗi bài học.
 ====================================================================== */
 window.EN_CURRICULUM = [
+ {
+  "grade": 0,
+  "title": "Mầm non",
+  "subtitle": "Làm quen tiếng Anh: con vật, màu sắc, số đếm, trái cây, gia đình...",
+  "units": [
+   {
+    "title": "Chào hỏi (Greetings)",
+    "topic": "greetings",
+    "emoji": "👋",
+    "items": [
+     {
+      "en": "hello",
+      "vi": "xin chào",
+      "emoji": "👋"
+     },
+     {
+      "en": "hi",
+      "vi": "chào",
+      "emoji": "🙋"
+     },
+     {
+      "en": "yes",
+      "vi": "có",
+      "emoji": "✅"
+     },
+     {
+      "en": "no",
+      "vi": "không",
+      "emoji": "❌"
+     },
+     {
+      "en": "please",
+      "vi": "làm ơn",
+      "emoji": "🥺"
+     },
+     {
+      "en": "thanks",
+      "vi": "cảm ơn",
+      "emoji": "🙏"
+     }
+    ]
+   },
+   {
+    "title": "Màu sắc (Colors)",
+    "topic": "colors",
+    "emoji": "🎨",
+    "items": [
+     {
+      "en": "red",
+      "vi": "đỏ",
+      "emoji": "🔴"
+     },
+     {
+      "en": "yellow",
+      "vi": "vàng",
+      "emoji": "🟡"
+     },
+     {
+      "en": "blue",
+      "vi": "xanh dương",
+      "emoji": "🔵"
+     },
+     {
+      "en": "green",
+      "vi": "xanh lá",
+      "emoji": "🟢"
+     },
+     {
+      "en": "orange",
+      "vi": "cam",
+      "emoji": "🟠"
+     },
+     {
+      "en": "pink",
+      "vi": "hồng",
+      "emoji": "🩷"
+     },
+     {
+      "en": "purple",
+      "vi": "tím",
+      "emoji": "🟣"
+     }
+    ]
+   },
+   {
+    "title": "Số đếm 1-5 (Numbers)",
+    "topic": "numbers",
+    "emoji": "🔢",
+    "items": [
+     {
+      "en": "one",
+      "vi": "một",
+      "emoji": "1️⃣"
+     },
+     {
+      "en": "two",
+      "vi": "hai",
+      "emoji": "2️⃣"
+     },
+     {
+      "en": "three",
+      "vi": "ba",
+      "emoji": "3️⃣"
+     },
+     {
+      "en": "four",
+      "vi": "bốn",
+      "emoji": "4️⃣"
+     },
+     {
+      "en": "five",
+      "vi": "năm",
+      "emoji": "5️⃣"
+     }
+    ]
+   },
+   {
+    "title": "Con vật (Animals)",
+    "topic": "animals",
+    "emoji": "🐶",
+    "items": [
+     {
+      "en": "dog",
+      "vi": "con chó",
+      "emoji": "🐶"
+     },
+     {
+      "en": "cat",
+      "vi": "con mèo",
+      "emoji": "🐱"
+     },
+     {
+      "en": "fish",
+      "vi": "con cá",
+      "emoji": "🐟"
+     },
+     {
+      "en": "bird",
+      "vi": "con chim",
+      "emoji": "🐦"
+     },
+     {
+      "en": "duck",
+      "vi": "con vịt",
+      "emoji": "🦆"
+     },
+     {
+      "en": "cow",
+      "vi": "con bò",
+      "emoji": "🐮"
+     },
+     {
+      "en": "pig",
+      "vi": "con lợn",
+      "emoji": "🐷"
+     }
+    ]
+   },
+   {
+    "title": "Trái cây (Fruits)",
+    "topic": "fruits",
+    "emoji": "🍎",
+    "items": [
+     {
+      "en": "apple",
+      "vi": "quả táo",
+      "emoji": "🍎"
+     },
+     {
+      "en": "banana",
+      "vi": "quả chuối",
+      "emoji": "🍌"
+     },
+     {
+      "en": "grape",
+      "vi": "quả nho",
+      "emoji": "🍇"
+     },
+     {
+      "en": "mango",
+      "vi": "quả xoài",
+      "emoji": "🥭"
+     },
+     {
+      "en": "strawberry",
+      "vi": "quả dâu",
+      "emoji": "🍓"
+     },
+     {
+      "en": "watermelon",
+      "vi": "quả dưa hấu",
+      "emoji": "🍉"
+     }
+    ]
+   },
+   {
+    "title": "Bộ phận cơ thể (Body)",
+    "topic": "body",
+    "emoji": "🧒",
+    "items": [
+     {
+      "en": "eye",
+      "vi": "mắt",
+      "emoji": "👁️"
+     },
+     {
+      "en": "nose",
+      "vi": "mũi",
+      "emoji": "👃"
+     },
+     {
+      "en": "ear",
+      "vi": "tai",
+      "emoji": "👂"
+     },
+     {
+      "en": "mouth",
+      "vi": "miệng",
+      "emoji": "👄"
+     },
+     {
+      "en": "hand",
+      "vi": "tay",
+      "emoji": "✋"
+     },
+     {
+      "en": "foot",
+      "vi": "chân",
+      "emoji": "🦶"
+     }
+    ]
+   },
+   {
+    "title": "Gia đình (Family)",
+    "topic": "family",
+    "emoji": "👪",
+    "items": [
+     {
+      "en": "dad",
+      "vi": "bố",
+      "emoji": "👨"
+     },
+     {
+      "en": "mom",
+      "vi": "mẹ",
+      "emoji": "👩"
+     },
+     {
+      "en": "baby",
+      "vi": "em bé",
+      "emoji": "👶"
+     },
+     {
+      "en": "brother",
+      "vi": "anh trai",
+      "emoji": "👦"
+     },
+     {
+      "en": "sister",
+      "vi": "chị gái",
+      "emoji": "👧"
+     },
+     {
+      "en": "grandpa",
+      "vi": "ông",
+      "emoji": "👴"
+     },
+     {
+      "en": "grandma",
+      "vi": "bà",
+      "emoji": "👵"
+     }
+    ]
+   },
+   {
+    "title": "Đồ chơi (Toys)",
+    "topic": "toys",
+    "emoji": "🧸",
+    "items": [
+     {
+      "en": "ball",
+      "vi": "quả bóng",
+      "emoji": "⚽"
+     },
+     {
+      "en": "teddy",
+      "vi": "gấu bông",
+      "emoji": "🧸"
+     },
+     {
+      "en": "doll",
+      "vi": "búp bê",
+      "emoji": "🪆"
+     },
+     {
+      "en": "car",
+      "vi": "ô tô",
+      "emoji": "🚗"
+     },
+     {
+      "en": "kite",
+      "vi": "diều",
+      "emoji": "🪁"
+     },
+     {
+      "en": "balloon",
+      "vi": "bóng bay",
+      "emoji": "🎈"
+     },
+     {
+      "en": "blocks",
+      "vi": "khối xếp hình",
+      "emoji": "🧱"
+     }
+    ]
+   }
+  ]
+ },
  {
   "grade": 1,
   "title": "Lớp 1",

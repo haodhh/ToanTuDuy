@@ -24,16 +24,18 @@ Nhiều bài giữ **đúng nội dung như sách**; các bài còn lại dùng 
 
 ## 🔤 Mục Tiếng Anh cho bé
 
-Từ vựng bám theo **sách giáo khoa tiếng Anh tiểu học của Bộ GD&ĐT** (bộ Global Success), chia theo **Lớp 1 → Lớp 5**.
-Mỗi lớp gồm nhiều **chủ đề** quen thuộc (chào hỏi, màu sắc, số đếm, gia đình, con vật, đồ ăn, trường lớp, nghề nghiệp…).
+Từ vựng bám theo **sách giáo khoa tiếng Anh tiểu học của Bộ GD&ĐT** (bộ Global Success), chia theo cấp độ:
+
+- 🧸 **Mầm non (làm quen)** — từ đơn cực dễ kèm hình cho bé chưa biết đọc.
+- **Lớp 1 → Lớp 5** — nhiều **chủ đề** quen thuộc (chào hỏi, màu sắc, số đếm, gia đình, con vật, đồ ăn, trường lớp, nghề nghiệp…).
+- 🏆 **Ôn tập tổng hợp** — trộn từ vựng & mẫu câu của **tất cả các lớp** để ôn lại.
 
 Mỗi bài tự sinh nhiều kiểu chơi vui nhộn:
 
-- **Nghe rồi chọn hình / chọn từ** đúng.
-- **Xem hình chọn từ tiếng Anh**, **đọc từ chọn hình**.
-- **Nối hình với từ**, **nối từ tiếng Anh với nghĩa tiếng Việt**.
+- **Từ vựng:** nghe rồi chọn hình / chọn từ, xem hình chọn từ, đọc từ chọn hình, nối hình với từ, nối từ với nghĩa tiếng Việt.
+- **Mẫu câu giao tiếp (Lớp 3–5):** nghe câu chọn nghĩa, chọn câu tiếng Anh theo nghĩa, nối câu với nghĩa.
 
-👉 Từ tiếng Anh được **phát âm bằng giọng tiếng Anh**; câu hướng dẫn vẫn bằng tiếng Việt để bé dễ hiểu.
+👉 Từ và câu tiếng Anh được **phát âm bằng giọng tiếng Anh**; câu hướng dẫn vẫn bằng tiếng Việt để bé dễ hiểu.
 
 ## 🎮 Cách chơi
 
