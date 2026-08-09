@@ -323,10 +323,17 @@ const Game = (() => {
 
     // câu dẫn (có nút loa). q.say (nếu có) = câu đọc riêng, dễ nghe hơn q.prompt
     // q.lang = 'en' -> đọc bằng tiếng Anh; q.noSpeak -> không tự đọc (bấm loa mới đọc)
-    const spoken = q.say != null ? q.say : q.prompt;
+    // Tự đánh số câu theo THỨ TỰ trong bài: đổi nhãn "Bài N" ở đầu câu thành
+    // đúng số thứ tự (nhiều bài gốc để cứng "Bài 1" nên không tăng). Câu tiếng
+    // Anh & câu không có nhãn "Bài" sẽ không bị đụng tới.
+    const num = s.idx + 1;
+    const renumber = (t) => (typeof t === 'string')
+      ? t.replace(/^(\s*Bài\s+)\d+[a-z]?/i, '$1' + num) : t;
+    const promptHtml = renumber(q.prompt);
+    const spoken = renumber(q.say != null ? q.say : q.prompt);
     s.spoken = spoken; s.spokenLang = q.lang || 'vi';
     const p = el('div', 'prompt');
-    p.innerHTML = `<span>${q.prompt}</span><span class="say" title="Nghe">🔊</span>`;
+    p.innerHTML = `<span>${promptHtml}</span><span class="say" title="Nghe">🔊</span>`;
     p.querySelector('.say').onclick = () => speak(spoken, s.spokenLang);
     body.appendChild(p);
     if (!q.noSpeak) speak(spoken, s.spokenLang);

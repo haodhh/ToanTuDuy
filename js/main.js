@@ -47,9 +47,12 @@
     while (qs.length < n && guard++ < 40) { const l = Game.pick(pool); try { const b = l.build(); if (b.length) qs.push(tag(Game.pick(b), l.id)); } catch (e) { } }
     return qs.slice(0, n);
   }
+  // "Kiểm tra đánh giá": random trong TẤT CẢ bài của Tập (không chỉ bài đã học),
+  // mỗi câu lấy từ một bài khác nhau (đủ bài thì không trùng), tự sinh câu mới.
   function reviewNew(base, n) {
-    const pool = reviewPool(base);
-    const order = Game.shuffle(pool.slice());        // chọn 10 bài khác nhau nếu đủ
+    const pool = base.slice();                       // toàn bộ bài của Tập
+    if (!pool.length) return [];
+    const order = Game.shuffle(pool.slice());        // chọn n bài khác nhau nếu đủ
     const qs = [];
     for (let i = 0; i < n; i++) {
       const l = order.length >= n ? order[i] : Game.pick(pool);
