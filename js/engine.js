@@ -305,8 +305,11 @@ const Game = (() => {
   // gọi khi trả lời xong 1 câu
   function answered(ok) {
     const s = session;
+    const q = s.questions[s.idx];
+    // ghi nhận "hay sai" theo bài gốc (_srcId trong bài ôn tập, hoặc chính bài đang chơi)
+    const srcId = (q && q._srcId) || (s.lesson && s.lesson.id);
     if (ok) {
-      if (s.firstTry) s.correct++;
+      if (s.firstTry) { s.correct++; if (window.Store && srcId) Store.easeMiss(srcId); }
       toast(true);
       setTimeout(() => {
         s.idx++;
@@ -315,6 +318,7 @@ const Game = (() => {
         else renderQuestion();
       }, 950);
     } else {
+      if (s.firstTry && window.Store && srcId) Store.addMiss(srcId);
       s.firstTry = false;
       toast(false);
     }

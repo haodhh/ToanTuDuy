@@ -20,11 +20,12 @@ window.Store = (function () {
   function read() { try { return JSON.parse(localStorage.getItem(KEY)); } catch (e) { return null; } }
   function write(d) { try { localStorage.setItem(KEY, JSON.stringify(d)); } catch (e) { } emit(); }
 
+  const MISS_CAP = 12;
   function newProfile(name, emoji, color) {
     return {
       id: uid(), name: (name || 'Bé yêu').trim().slice(0, 20) || 'Bé yêu',
       emoji: emoji || pick(EMOJIS), color: color || pick(COLORS),
-      stars: {}, last: null, created: Date.now(), updated: Date.now()
+      stars: {}, miss: {}, last: null, created: Date.now(), updated: Date.now()
     };
   }
 
@@ -81,6 +82,18 @@ window.Store = (function () {
   function setLast(vol, lesson) { const d = data(); const p = d.profiles.find(x => x.id === d.activeId); if (p) { p.last = { vol, lesson }; write(d); } }
   const getLast = () => getActive().last;
 
+  /* ---------- điểm "hay làm sai" theo từng bài ---------- */
+  const getMiss = () => getActive().miss || {};
+  function addMiss(lessonId) {            // trả lời sai lần đầu -> tăng điểm yếu
+    const d = data(); const p = d.profiles.find(x => x.id === d.activeId); if (!p) return;
+    if (!p.miss) p.miss = {};
+    p.miss[lessonId] = Math.min(MISS_CAP, (p.miss[lessonId] || 0) + 1); p.updated = Date.now(); write(d);
+  }
+  function easeMiss(lessonId) {           // làm đúng ngay -> giảm dần điểm yếu
+    const d = data(); const p = d.profiles.find(x => x.id === d.activeId); if (!p || !p.miss || !p.miss[lessonId]) return;
+    p.miss[lessonId] -= 1; if (p.miss[lessonId] <= 0) delete p.miss[lessonId]; p.updated = Date.now(); write(d);
+  }
+
   const onChange = (fn) => { if (typeof fn === 'function') listeners.push(fn); };
 
   /* ---------- xuất / nhập file sao lưu ---------- */
@@ -107,13 +120,17 @@ window.Store = (function () {
         const s = cur.stars || {}, is = ip.stars || {};
         Object.keys(is).forEach(k => { if (!s[k] || is[k] > s[k]) s[k] = is[k]; });
         cur.stars = s;
+        const m = cur.miss || {}, im = ip.miss || {};
+        Object.keys(im).forEach(k => { if (!m[k] || im[k] > m[k]) m[k] = im[k]; });
+        cur.miss = m;
         cur.name = ip.name || cur.name; cur.emoji = ip.emoji || cur.emoji; cur.color = ip.color || cur.color;
         cur.last = ip.last || cur.last; merged++;
       } else {
         const np = {
           id: ip.id, name: ip.name || 'Bé', emoji: ip.emoji || '🐼', color: ip.color || COLORS[0],
-          stars: (ip.stars && typeof ip.stars === 'object') ? ip.stars : {}, last: ip.last || null,
-          created: ip.created || Date.now(), updated: Date.now()
+          stars: (ip.stars && typeof ip.stars === 'object') ? ip.stars : {},
+          miss: (ip.miss && typeof ip.miss === 'object') ? ip.miss : {},
+          last: ip.last || null, created: ip.created || Date.now(), updated: Date.now()
         };
         d.profiles.push(np); byId[np.id] = np; added++;
       }
@@ -137,6 +154,7 @@ window.Store = (function () {
     EMOJIS, COLORS,
     getProfiles, getActive, setActive, addProfile, updateProfile, deleteProfile,
     getStars, setStar, totalStars, doneCount, setLast, getLast,
+    getMiss, addMiss, easeMiss,
     onChange, exportFile, importText
   };
 })();

@@ -19,13 +19,14 @@
     const learned = base.filter(l => stars[l.id]);
     return learned.length ? learned : base.slice();
   }
+  const tag = (q, id) => { if (q) q._srcId = id; return q; };   // gắn bài gốc để ghi nhận "hay sai"
   function reviewOld(base, n) {
     const pool = reviewPool(base);
     let qs = [];
-    pool.forEach(l => { try { qs = qs.concat(l.build()); } catch (e) { } });
+    pool.forEach(l => { try { const b = l.build(); b.forEach(q => tag(q, l.id)); qs = qs.concat(b); } catch (e) { } });
     qs = Game.shuffle(qs);
     let guard = 0;                                   // nếu chưa đủ n thì sinh thêm
-    while (qs.length < n && guard++ < 40) { const l = Game.pick(pool); try { const b = l.build(); if (b.length) qs.push(Game.pick(b)); } catch (e) { } }
+    while (qs.length < n && guard++ < 40) { const l = Game.pick(pool); try { const b = l.build(); if (b.length) qs.push(tag(Game.pick(b), l.id)); } catch (e) { } }
     return qs.slice(0, n);
   }
   function reviewNew(base, n) {
@@ -34,7 +35,20 @@
     const qs = [];
     for (let i = 0; i < n; i++) {
       const l = order.length >= n ? order[i] : Game.pick(pool);
-      try { const b = l.build(); if (b.length) qs.push(Game.pick(b)); } catch (e) { }
+      try { const b = l.build(); if (b.length) qs.push(tag(Game.pick(b), l.id)); } catch (e) { }
+    }
+    return qs.slice(0, n);
+  }
+  // Luyện các bài bé HAY SAI: ưu tiên bài có điểm sai cao, tự sinh câu mới
+  function reviewWeak(base, n) {
+    const miss = (window.Store && Store.getMiss) ? Store.getMiss() : {};
+    let pool = base.filter(l => (miss[l.id] || 0) > 0).sort((a, b) => (miss[b.id] || 0) - (miss[a.id] || 0));
+    if (!pool.length) pool = reviewPool(base);       // chưa có lỗi -> ôn các bài đã học
+    const qs = [];
+    let i = 0, guard = 0;
+    while (qs.length < n && guard++ < n * 5) {
+      const l = pool[i % pool.length]; i++;          // xoay vòng theo thứ tự sai nhiều -> ít
+      try { const b = l.build(); if (b.length) qs.push(tag(Game.pick(b), l.id)); } catch (e) { }
     }
     return qs.slice(0, n);
   }
@@ -45,6 +59,7 @@
     vol.parts.push({ n: 3, title: 'Ôn tập tổng hợp', chip: 'Phần 3' });
     vol.lessons.push({ part: 3, num: maxNum + 1, emoji: '📝', title: 'Ôn tập bài đã học', id: vol.id + '-rv1', build: () => reviewOld(base, REV_N) });
     vol.lessons.push({ part: 3, num: maxNum + 2, emoji: '🎯', title: 'Kiểm tra đánh giá', id: vol.id + '-rv2', build: () => reviewNew(base, REV_N) });
+    vol.lessons.push({ part: 3, num: maxNum + 3, emoji: '💪', title: 'Luyện phần hay sai', id: vol.id + '-rv3', build: () => reviewWeak(base, REV_N) });
   }
   VOLUMES.forEach(addReviewPart);
 
