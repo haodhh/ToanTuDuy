@@ -523,6 +523,49 @@ const Game = (() => {
     obs.observe(grid, { subtree: true, attributes: true, attributeFilter: ['class'] });
   };
 
+  /* --- 8d) Number bond: tách/gộp số lượng (điền số còn thiếu) --- */
+  function nbNode(node, kind) {
+    const d = el('div', 'nb-node ' + kind + (node.blank ? ' blank' : ''));
+    if (node.blank) { d.dataset.blank = '1'; d.innerHTML = '<span class="nb-num">?</span>'; }
+    else if (node.show === 'dots') d.innerHTML = range(node.n).map(() => '<span class="nb-dot"></span>').join('');
+    else if (node.show === 'objs') d.innerHTML = range(node.n).map(() => `<span class="nb-em">${node.g}</span>`).join('');
+    else d.innerHTML = `<span class="nb-num">${node.n}</span>`;
+    return d;
+  }
+  RENDERERS.numberbond = (q, host) => {
+    const wrap = el('div', 'nb-wrap');
+    const parts = el('div', 'nb-parts');
+    parts.appendChild(nbNode(q.parts[0], 'part'));
+    parts.appendChild(nbNode(q.parts[1], 'part'));
+    const conn = el('div', 'nb-connector');
+    conn.innerHTML = `<svg viewBox="0 0 46 110" width="46" height="110" xmlns="http://www.w3.org/2000/svg">
+      <line x1="2" y1="28" x2="44" y2="55" stroke="#90a4ae" stroke-width="4" stroke-linecap="round"/>
+      <line x1="2" y1="82" x2="44" y2="55" stroke="#90a4ae" stroke-width="4" stroke-linecap="round"/></svg>`;
+    const whole = nbNode(q.whole, 'whole');
+    // thứ tự hiển thị: gộp = parts→whole; tách = whole→parts
+    if (q.mode === 'tach') { wrap.appendChild(whole); const c2 = conn.cloneNode(true); c2.style.transform = 'scaleX(-1)'; wrap.appendChild(c2); wrap.appendChild(parts); }
+    else { wrap.appendChild(parts); wrap.appendChild(conn); wrap.appendChild(whole); }
+    host.appendChild(wrap);
+
+    const box = el('div', 'options cols-' + Math.min(q.options.length, 4));
+    (q.noShuffle ? q.options : shuffle(q.options)).forEach(v => {
+      const b = el('div', 'opt');
+      b.innerHTML = `<span class="lab" style="font-size:28px;font-weight:900">${v}</span>`;
+      b.onclick = () => {
+        if (b.classList.contains('disabled')) return;
+        sfx.tap();
+        if (v === q.answer) {
+          b.classList.add('correct'); lockOpts(box);
+          const blank = host.querySelector('[data-blank]');
+          if (blank) { blank.classList.remove('blank'); blank.innerHTML = `<span class="nb-num">${q.answer}</span>`; }
+          answered(true);
+        } else { b.classList.add('wrong', 'disabled'); answered(false); }
+      };
+      box.appendChild(b);
+    });
+    host.appendChild(box);
+  };
+
   /* --- 8c) Tally: đếm từng loại rồi chọn số (thống kê) --- */
   RENDERERS.tally = (q, host) => {
     if (q.sceneHTML) { const sc = el('div', 'scene'); sc.innerHTML = q.sceneHTML; host.appendChild(sc); }

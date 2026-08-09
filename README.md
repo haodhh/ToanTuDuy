@@ -9,10 +9,10 @@ mỗi lần chơi câu hỏi lại được **tạo ngẫu nhiên mới**. 🎉
 
 ## ✨ Tính năng
 
-- **20 bài học** đúng theo mục lục sách, chia 2 phần:
+- **20 bài học** dựng lại theo đúng sách, chia 2 phần:
   - *Phần 1 – Xác định vị trí:* trên/dưới/giữa, trái/phải, trong/ngoài, xa/gần, to/nhỏ, cao/thấp, dài/ngắn, phương hướng, thống kê số liệu.
   - *Phần 2 – Toán quy luật:* quy luật màu sắc, hình khối, thứ tự, đối chiếu hình, tìm vật xuất hiện 1 lần, tìm hình giống hệt, hình liên quan, tìm bóng, tìm điểm khác biệt, tìm điểm không hợp lí, ôn tập.
-- Câu hỏi **ngẫu nhiên mỗi lần chơi** → chơi lại không nhàm chán.
+- Bài 1–12 và 16 giữ **đúng nội dung như sách** (câu hỏi, đáp án, thứ tự). Các bài tìm/nối/khác biệt còn lại dùng **đúng dạng bài** với nội dung tạo mới mỗi lần → **chơi lại không nhàm chán**.
 - **Giọng đọc tiếng Việt** đọc câu hỏi (nếu thiết bị có sẵn giọng vi-VN).
 - **Âm thanh vui nhộn**, ngôi sao thưởng ⭐ và pháo giấy 🎊 khi hoàn thành.
 - **Lưu kết quả** số sao của bé (trong máy, dùng localStorage).

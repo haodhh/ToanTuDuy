@@ -12,6 +12,7 @@
   <!-- MÀN HÌNH CHÍNH -->
   <div id="screen-menu" class="screen active">
     <header class="app-header">
+      <button class="menu-btn" id="menuToggle" aria-label="Chọn tập sách">☰</button>
       <div class="mascot-wrap" id="menuMascot"></div>
       <div class="title-wrap">
         <h1>Toán Tư Duy</h1>
@@ -20,12 +21,19 @@
       <button class="sound-toggle" id="soundToggle" title="Bật/tắt âm thanh">🔊</button>
     </header>
 
-    <main id="menuBody" class="menu-body">
-      <!-- các thẻ bài học được sinh bằng JS -->
-    </main>
+    <div class="menu-layout">
+      <aside class="sidebar" id="sidebar" aria-label="Chọn tập sách">
+        <div class="sidebar-title">📚 Chọn tập sách</div>
+        <div id="volList"></div>
+      </aside>
+      <div class="scrim" id="scrim"></div>
+      <main id="menuBody" class="menu-body">
+        <!-- các thẻ bài học được sinh bằng JS -->
+      </main>
+    </div>
 
     <footer class="app-footer">
-      <span>Dựa theo sách <b>“Phiếu luyện Toán tư duy cùng Gấu KIKI 3”</b> — Bé chơi lại bao nhiêu lần cũng được! 💛</span>
+      <span>Dựa theo bộ sách <b>“Phiếu luyện Toán tư duy cùng Gấu KIKI”</b> — Bé chơi lại bao nhiêu lần cũng được! 💛</span>
     </footer>
   </div>
 
@@ -45,6 +53,7 @@
   <script src="js/engine.js"></script>
   <script src="js/art.js"></script>
   <script src="js/lessons.js"></script>
+  <script src="js/lessons-t4.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

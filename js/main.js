@@ -1,11 +1,13 @@
 /* ================= MAIN =================
-   Dựng menu, điều hướng giữa các màn hình.
+   Dựng thanh chọn tập sách (sidebar) + menu bài học,
+   điều hướng giữa các màn hình.
 ====================================== */
 (function () {
   'use strict';
   const $ = (id) => document.getElementById(id);
+  const VOLUMES = [VOL_T3, VOL_T4];
+  let currentVol = VOLUMES[0];
 
-  /* mascot */
   $('menuMascot').innerHTML = Game.pandaSVG();
 
   /* nút âm thanh */
@@ -17,25 +19,52 @@
     if (on) Game.sfx.click();
   };
 
-  /* dựng menu */
+  /* ---- sidebar chọn tập ---- */
+  function buildSidebar() {
+    const wrap = $('volList'); wrap.innerHTML = '';
+    const stars = Game.loadAllStars();
+    VOLUMES.forEach(v => {
+      const done = v.lessons.filter(l => stars[l.id]).length;
+      const card = document.createElement('button');
+      card.className = 'vol-item' + (v.id === currentVol.id ? ' active' : '');
+      card.innerHTML = `
+        <span class="vol-emoji">${v.emoji}</span>
+        <span class="vol-text"><b>${v.name}</b><small>${v.subtitle}</small>
+        <span class="vol-prog">${done}/${v.lessons.length} bài ✔</span></span>`;
+      card.onclick = () => { Game.sfx.click(); selectVolume(v); closeDrawer(); };
+      wrap.appendChild(card);
+    });
+  }
+
+  function selectVolume(v) {
+    currentVol = v;
+    buildSidebar();
+    buildMenu();
+    $('menuBody').scrollTop = 0;
+  }
+
+  /* ---- lưới bài học của tập hiện tại ---- */
   function buildMenu() {
     const body = $('menuBody'); body.innerHTML = '';
+    const head = document.createElement('div');
+    head.className = 'vol-head';
+    head.innerHTML = `<h2>${currentVol.emoji} ${currentVol.name}</h2><p>${currentVol.subtitle}</p>`;
+    body.appendChild(head);
+
     const stars = Game.loadAllStars();
-    const parts = [
-      { n: 1, title: 'Xác định vị trí', chip: 'Phần 1' },
-      { n: 2, title: 'Toán quy luật', chip: 'Phần 2' }
-    ];
-    parts.forEach(pt => {
+    currentVol.parts.forEach(pt => {
+      const inPart = currentVol.lessons.filter(l => l.part === pt.n);
+      if (!inPart.length) return;
       const h = document.createElement('div');
       h.className = 'part-title';
       h.innerHTML = `<span class="chip">${pt.chip}</span> ${pt.title}`;
       body.appendChild(h);
       const grid = document.createElement('div');
       grid.className = 'lesson-grid';
-      LESSONS.filter(l => l.part === pt.n).forEach(l => {
-        const card = document.createElement('div');
-        card.className = 'lesson-card' + (stars[l.id] ? ' done' : '');
+      inPart.forEach(l => {
         const got = stars[l.id] || 0;
+        const card = document.createElement('div');
+        card.className = 'lesson-card' + (got ? ' done' : '');
         card.innerHTML = `
           <span class="num">${l.num}</span>
           <span class="emoji">${l.emoji}</span>
@@ -48,36 +77,36 @@
     });
   }
 
+  /* ---- drawer (mobile) ---- */
+  function openDrawer() { $('sidebar').classList.add('open'); $('scrim').classList.add('show'); }
+  function closeDrawer() { $('sidebar').classList.remove('open'); $('scrim').classList.remove('show'); }
+  $('menuToggle').onclick = () => { Game.sfx.click(); $('sidebar').classList.contains('open') ? closeDrawer() : openDrawer(); };
+  $('scrim').onclick = closeDrawer;
+
+  /* ---- điều hướng ---- */
   function show(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     $(id).classList.add('active');
     window.scrollTo(0, 0);
   }
-
-  function openLesson(lesson) {
-    show('screen-play');
-    Game.startSession(lesson, onExit);
-  }
-
+  function openLesson(lesson) { show('screen-play'); Game.startSession(lesson, onExit); }
   function onExit(action, lesson) {
     if (action === 'next') {
-      const idx = LESSONS.findIndex(l => l.id === lesson.id);
-      const nxt = LESSONS[(idx + 1) % LESSONS.length];
-      Game.startSession(nxt, onExit);
-    } else { // home
-      buildMenu();
-      show('screen-menu');
+      const ls = currentVol.lessons;
+      const idx = ls.findIndex(l => l.id === lesson.id);
+      Game.startSession(ls[(idx + 1) % ls.length], onExit);
+    } else {
+      buildSidebar(); buildMenu(); show('screen-menu');
     }
   }
-
-  $('btnBack').onclick = () => { Game.sfx.click(); if ('speechSynthesis' in window) speechSynthesis.cancel(); buildMenu(); show('screen-menu'); };
+  $('btnBack').onclick = () => { Game.sfx.click(); if ('speechSynthesis' in window) speechSynthesis.cancel(); buildSidebar(); buildMenu(); show('screen-menu'); };
   $('btnSpeak').onclick = () => { const p = document.querySelector('.prompt span'); if (p) Game.speak(p.textContent); };
 
-  // khởi động: mở khoá âm thanh khi chạm lần đầu (chính sách trình duyệt)
   document.body.addEventListener('pointerdown', function unlock() {
     Game.sfx.tap();
     document.body.removeEventListener('pointerdown', unlock);
   }, { once: true });
 
+  buildSidebar();
   buildMenu();
 })();

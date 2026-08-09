@@ -3,7 +3,7 @@
    ra danh sách câu hỏi NGẪU NHIÊN (chơi lại
    mỗi lần một khác). Dựa theo mục lục sách.
 =========================================== */
-const LESSONS = (() => {
+const VOL_T3 = (() => {
   const G = Game;
   const { rnd, pick, shuffle, sample, range, COLOR_KEYS, SHAPES } = G;
 
@@ -438,19 +438,23 @@ const LESSONS = (() => {
     ];
   }
 
-  // Bài 12: quy luật thứ tự (dãy dài, ô ? ở giữa)
+  // Bài 12: QUY LUẬT THỨ TỰ (bản sao theo sách trang 26-27)
   function b12() {
-    return many(6, () => {
-      const three = sample(animalSea, 3);
-      const unit = [0, 1, 2];
-      const seq = [];
-      for (let i = 0; i < 6; i++) seq.push(three[unit[i % 3]]);
-      const qpos = 1 + rnd(4); // vị trí ? (1..4)
-      const answer = seq[qpos];
-      seq[qpos] = '?';
-      const options = shuffle(three.map(e => ({ g: e, correct: e === answer })));
-      return { type: 'pattern', prompt: 'Điền hình còn thiếu vào ô ❓', sequence: seq, options };
-    });
+    const o3 = (a, b, c, correct) => [a, b, c].map(x => ({ g: x, correct: x === correct }));
+    return [
+      // quái vật (monsters) — xen kẽ và lặp nhóm 3
+      pat('Bài 1.', ['👾', '👹', '👾', '👹', '👾', '👹', '?'], o3('👾', '👹', '👽', '👾')),
+      pat('Bài 1.', ['🔵', '👺', '👺', '🔵', '👺', '👺', '?'], o3('👾', '👺', '🔵', '🔵')),
+      pat('Bài 1.', ['👽', '🟠', '👾', '👽', '🟠', '👾', '?'], o3('👾', '👽', '🟠', '👽')),
+      // mặt con vật (animal faces)
+      pat('Bài 1.', ['🦁', '🐸', '🦁', '🐸', '🦁', '🐸', '?'], o3('🐸', '🦓', '🦁', '🦁')),
+      pat('Bài 1.', ['🐵', '🐵', '🦓', '🐵', '🐵', '🦓', '?'], o3('🐸', '🐵', '🦓', '🐵')),
+      pat('Bài 1.', ['🐘', '🦒', '🐷', '🐘', '🦒', '🐷', '?'], o3('🐘', '🦒', '🐷', '🐘')),
+      // con vật biển & trái cây
+      pat('Bài 1.', ['⭐', '⭐', '🐡', '🐡', '⭐', '⭐', '?'], o3('🐢', '🐡', '⭐', '🐡')),
+      pat('Bài 1.', ['🐠', '🪼', '🐟', '🐠', '🪼', '🐟', '?'], o3('🐟', '🪼', '🐠', '🐠')),
+      pat('Bài 1.', ['🍉', '🫐', '🍉', '🫐', '🍉', '🫐', '?'], o3('🍉', '🍎', '🫐', '🍉')),
+    ];
   }
 
   // Bài 13: đối chiếu hình ảnh (nối hình giống nhau ở 2 cột)
@@ -486,17 +490,24 @@ const LESSONS = (() => {
     });
   }
 
-  // Bài 16: tìm hình ảnh có liên quan (nối con vật với thứ liên quan)
+  // Bài 16: TÌM HÌNH ẢNH CÓ LIÊN QUAN (bản sao theo sách trang 34-35)
   function b16() {
-    const relations = [
-      ['🐶', '🦴'], ['🐱', '🐟'], ['🐰', '🥕'], ['🐵', '🍌'], ['🐻', '🍯'],
-      ['🐮', '🥛'], ['🐝', '🌻'], ['🐭', '🧀'], ['🐦', '🪺'], ['🕷️', '🕸️'],
-      ['🐛', '🍃'], ['🐢', '💧'], ['🦉', '🌙'], ['🐴', '🌾'], ['🐷', '🌽']
+    return [
+      { type: 'match', prompt: 'Bài 1. Nối con vật con với con vật lớn <b>cùng loài</b>.',
+        pairs: [['🐷', '🐖'], ['🐶', '🦮'], ['🐱', '🐈'], ['🐤', '🐔']] },
+      { type: 'match', prompt: 'Bài 2. Nối con vật với <b>nơi ở</b> của chúng.',
+        pairs: [['🐦', '🪺'], ['🐠', '🌊'], ['🐔', '🛖'], ['🕷️', '🕸️']] },
+      { type: 'match', prompt: 'Bài 3. Nối con vật với <b>thức ăn</b> của chúng.',
+        pairs: [['🐊', '🥩'], ['🐵', '🍌'], ['🐭', '🧀'], ['🐄', '🌿']] },
+      { type: 'tap',
+        prompt: 'Bài 4. Chạm vào nhóm động vật cùng loài có <b>4 con</b>.',
+        items: shuffle([
+          { g: '🦊🦊🦊', size: 30, correct: false },
+          { g: '🐶🐶🐶🐶', size: 30, correct: true },
+          { g: '🐱🐱🐱', size: 30, correct: false },
+          { g: '🐘🐘', size: 30, correct: false },
+        ]) },
     ];
-    return many(5, () => {
-      const set = sample(relations, 4);
-      return { type: 'match', prompt: 'Nối con vật với thứ liên quan 🔗', pairs: set.map(r => [r[0], r[1]]) };
-    });
   }
 
   // Bài 17: tìm bóng cho hình (nối vật với "bóng" đen của nó)
@@ -565,6 +576,14 @@ const LESSONS = (() => {
     { part: 2, num: 19, emoji: '🤔', title: 'Tìm điểm không hợp lí', build: b19 },
     { part: 2, num: 20, emoji: '🏆', title: 'Ôn tập tổng hợp', build: b20 },
   ];
-  list.forEach(l => l.id = 'b' + l.num);
-  return list;
+  list.forEach(l => l.id = 't3-b' + l.num);
+  return {
+    id: 't3', num: 3, name: 'Tập 3', emoji: '🧭',
+    subtitle: 'Xác định vị trí · Toán quy luật',
+    parts: [
+      { n: 1, title: 'Xác định vị trí', chip: 'Phần 1' },
+      { n: 2, title: 'Toán quy luật', chip: 'Phần 2' },
+    ],
+    lessons: list,
+  };
 })();
