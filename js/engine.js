@@ -46,10 +46,12 @@ const Game = (() => {
   };
 
   /* ---------- giọng đọc tiếng Việt ----------
-     Ưu tiên giọng Google Dịch (chuẩn phát âm tiếng Việt hơn giọng máy).
-     Nếu không tải được (mất mạng / bị chặn) sẽ tự chuyển sang giọng có sẵn
-     của thiết bị. Mọi câu đọc đều được chuẩn hoá về TIẾNG VIỆT: bỏ emoji &
-     thẻ HTML, đổi ký hiệu toán ( + − = → ? ) thành chữ, tránh đọc lẫn tiếng Anh. */
+     LUÔN đọc bằng TIẾNG VIỆT. Ưu tiên Google TTS (chuẩn phát âm tiếng Việt).
+     Nếu Google TTS lỗi (mất mạng / bị chặn) thì chỉ chuyển sang giọng máy KHI
+     thiết bị có sẵn giọng tiếng Việt (vi-VN). Nếu máy KHÔNG có giọng tiếng Việt
+     thì IM LẶNG — tuyệt đối không đọc bằng giọng tiếng Anh (sẽ phát âm sai
+     tiếng Việt). Mọi câu đọc đều được chuẩn hoá: bỏ emoji & thẻ HTML, đổi ký
+     hiệu toán ( + − = → ? ) thành chữ tiếng Việt. */
   let viVoice = null;
   function loadVoices() {
     if (!('speechSynthesis' in window)) return;
@@ -97,12 +99,13 @@ const Game = (() => {
   }
   const gttsUrl = (chunk) =>
     'https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=vi&q=' + encodeURIComponent(chunk);
-  function speakLocal(text) {   // dự phòng: giọng có sẵn của thiết bị
+  function speakLocal(text) {   // dự phòng: CHỈ dùng khi thiết bị có giọng tiếng Việt
     if (!('speechSynthesis' in window) || !text) return;
+    if (!viVoice) loadVoices();               // giọng có thể nạp trễ -> quét lại
+    if (!viVoice) return;                     // không có giọng tiếng Việt -> IM LẶNG (không đọc tiếng Anh)
     try {
       const u = new SpeechSynthesisUtterance(text);
-      u.lang = 'vi-VN'; u.rate = 0.92; u.pitch = 1.06;
-      if (viVoice) u.voice = viVoice;
+      u.lang = 'vi-VN'; u.rate = 0.92; u.pitch = 1.06; u.voice = viVoice;
       speechSynthesis.speak(u);
     } catch (e) { }
   }
@@ -112,21 +115,28 @@ const Game = (() => {
     if (!clean) return;
     stopSpeak();
     const tok = sayTok, parts = ttsChunks(clean);
-    let i = 0, fellBack = false;
+    let i = 0, fellBack = false, tries = 0;
     function fallback() {
       if (fellBack || tok !== sayTok) return;
       fellBack = true; curAudio = null;
-      speakLocal(parts.slice(i).join(' '));   // đọc nốt phần còn lại bằng giọng máy
+      speakLocal(parts.slice(i).join(' '));   // đọc nốt phần còn lại (chỉ khi có giọng tiếng Việt)
     }
     function next() {
       if (tok !== sayTok) return;
       if (i >= parts.length) { curAudio = null; return; }
       const a = new Audio(gttsUrl(parts[i]));
       curAudio = a;
-      a.onended = () => { if (tok === sayTok) { i++; next(); } };
-      a.onerror = fallback;
+      let done = false;
+      a.onended = () => { if (done) return; done = true; if (tok === sayTok) { tries = 0; i++; next(); } };
+      const onFail = () => {                   // Google TTS lỗi
+        if (done) return; done = true;
+        if (tok !== sayTok) return;
+        if (tries++ < 1) next();               // thử lại đoạn này 1 lần (lỗi mạng tạm thời)
+        else fallback();                       // vẫn lỗi -> giọng tiếng Việt của máy (nếu có), không thì im lặng
+      };
+      a.onerror = onFail;
       const p = a.play();
-      if (p && p.catch) p.catch(fallback);    // autoplay bị chặn -> dùng giọng máy
+      if (p && p.catch) p.catch(onFail);       // autoplay bị chặn -> thử lại / giọng máy tiếng Việt
     }
     next();
   }
