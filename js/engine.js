@@ -45,37 +45,48 @@ const Game = (() => {
     click() { tone(700, .05, 'square', 0, .08); }
   };
 
-  /* ---------- giọng đọc tiếng Việt ----------
-     LUÔN đọc bằng TIẾNG VIỆT. Ưu tiên Google TTS (chuẩn phát âm tiếng Việt).
-     Nếu Google TTS lỗi (mất mạng / bị chặn) thì chỉ chuyển sang giọng máy KHI
-     thiết bị có sẵn giọng tiếng Việt (vi-VN). Nếu máy KHÔNG có giọng tiếng Việt
-     thì IM LẶNG — tuyệt đối không đọc bằng giọng tiếng Anh (sẽ phát âm sai
-     tiếng Việt). Mọi câu đọc đều được chuẩn hoá: bỏ emoji & thẻ HTML, đổi ký
-     hiệu toán ( + − = → ? ) thành chữ tiếng Việt. */
-  let viVoice = null;
+  /* ---------- giọng đọc song ngữ (Việt / Anh) ----------
+     Đọc câu hỏi bằng đúng NGÔN NGỮ của bài:
+       - Bài Toán tư duy (mặc định, lang='vi'): TIẾNG VIỆT. Ưu tiên Google TTS;
+         lỗi thì dùng giọng tiếng Việt của máy (nếu có), không có thì IM LẶNG —
+         tuyệt đối không đọc tiếng Việt bằng giọng tiếng Anh (phát âm sai).
+       - Bài Tiếng Anh (lang='en'): TIẾNG ANH. Máy thường có sẵn giọng tiếng Anh
+         nên đọc thẳng bằng giọng máy (ổn định, chạy được cả khi offline); thiếu
+         thì mới dùng Google TTS tiếng Anh. */
+  const voices = { vi: null, en: null };
   function loadVoices() {
     if (!('speechSynthesis' in window)) return;
     const vs = speechSynthesis.getVoices();
     const vi = vs.filter(v => /vi[-_]?VN/i.test(v.lang) || /vietnam/i.test(v.name));
-    // ưu tiên giọng "Google Tiếng Việt" (chính là giọng Google Dịch trên Chrome/Android)
-    viVoice = vi.find(v => /google/i.test(v.name)) || vi[0] || null;
+    const en = vs.filter(v => /^en([-_]|$)/i.test(v.lang) || /english/i.test(v.name));
+    // ưu tiên giọng "Google" (Chrome/Android), rồi tới các giọng phổ biến khác
+    voices.vi = vi.find(v => /google/i.test(v.name)) || vi[0] || null;
+    voices.en = en.find(v => /google/i.test(v.name))
+      || en.find(v => /(zira|aria|jenny|samantha|natural|female)/i.test(v.name))
+      || en[0] || null;
   }
   if ('speechSynthesis' in window) { loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
 
-  // Chuẩn hoá văn bản trước khi đọc -> chỉ còn tiếng Việt, không còn ký hiệu/emoji
-  function sayText(t) {
+  // Chuẩn hoá văn bản trước khi đọc: bỏ thẻ HTML & emoji; tiếng Việt thì đổi
+  // ký hiệu toán ( + − = → ? ) thành chữ, tiếng Anh thì giữ nguyên chữ & số.
+  function sayText(t, lang) {
     if (t == null) return '';
     let s = String(t)
       .replace(/<[^>]+>/g, ' ')                         // bỏ thẻ HTML
-      .replace(/[❓❔]/g, ' hỏi ')                        // dấu hỏi minh hoạ -> "hỏi"
-      .replace(/\s*[→➜➡►▶⟶]\s*/g, ' đến ')              // mũi tên "1→6" -> "1 đến 6"
-      .replace(/\s*↔\s*/g, ' và ')
-      .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{2190}-\u{21FF}\u{FE0F}\u{200D}\u{1F3FB}-\u{1F3FF}]/gu, ' ') // bỏ emoji còn lại
-      .replace(/\s*\+\s*/g, ' cộng ')                   // dấu cộng
-      .replace(/\s*×\s*(?=\d)/g, ' nhân ')              // dấu nhân
-      .replace(/(?<=\d)\s*[−–—-]\s*(?=\d)/g, ' trừ ')   // dấu trừ giữa hai số
-      .replace(/\s*=\s*/g, ' bằng ');                   // dấu bằng
-    s = s.split(/\s+/).map(w => (w === '?' ? 'mấy' : w)).filter(Boolean).join(' ');
+      .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{2190}-\u{21FF}\u{FE0F}\u{200D}\u{1F3FB}-\u{1F3FF}]/gu, ' '); // bỏ emoji
+    if (lang === 'en') {
+      s = s.replace(/[❓❔?]/g, ' ');                     // tiếng Anh: giữ nguyên chữ & số
+    } else {
+      s = s
+        .replace(/[❓❔]/g, ' hỏi ')                      // dấu hỏi minh hoạ -> "hỏi"
+        .replace(/\s*[→➜➡►▶⟶]\s*/g, ' đến ')            // mũi tên "1→6" -> "1 đến 6"
+        .replace(/\s*↔\s*/g, ' và ')
+        .replace(/\s*\+\s*/g, ' cộng ')                 // dấu cộng
+        .replace(/\s*×\s*(?=\d)/g, ' nhân ')            // dấu nhân
+        .replace(/(?<=\d)\s*[−–—-]\s*(?=\d)/g, ' trừ ') // dấu trừ giữa hai số
+        .replace(/\s*=\s*/g, ' bằng ');                 // dấu bằng
+      s = s.split(/\s+/).map(w => (w === '?' ? 'mấy' : w)).filter(Boolean).join(' ');
+    }
     s = s.replace(/\s+([.,;:!?)])/g, '$1').replace(/([(])\s+/g, '$1'); // bỏ khoảng trắng thừa quanh dấu câu
     return s.trim();
   }
@@ -97,34 +108,44 @@ const Game = (() => {
     if (cur) out.push(cur);
     return out.length ? out : [s];
   }
-  const gttsUrl = (chunk) =>
-    'https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=vi&q=' + encodeURIComponent(chunk);
-  function speakLocal(text) {   // dự phòng: CHỈ dùng khi thiết bị có giọng tiếng Việt
-    if (!('speechSynthesis' in window) || !text) return;
-    if (!viVoice) loadVoices();               // giọng có thể nạp trễ -> quét lại
-    if (!viVoice) return;                     // không có giọng tiếng Việt -> IM LẶNG (không đọc tiếng Anh)
+  const gttsUrl = (chunk, lang) =>
+    'https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=' +
+    (lang === 'en' ? 'en' : 'vi') + '&q=' + encodeURIComponent(chunk);
+  // Đọc bằng giọng có sẵn của máy đúng ngôn ngữ. Trả về true nếu đọc được.
+  function speakLocal(text, lang) {
+    if (!('speechSynthesis' in window) || !text) return false;
+    if (!voices[lang]) loadVoices();          // giọng có thể nạp trễ -> quét lại
+    const v = voices[lang];
+    if (!v) return false;                     // không có giọng đúng ngôn ngữ -> nơi gọi tự xử lý (im lặng)
     try {
       const u = new SpeechSynthesisUtterance(text);
-      u.lang = 'vi-VN'; u.rate = 0.92; u.pitch = 1.06; u.voice = viVoice;
+      u.lang = (lang === 'en') ? 'en-US' : 'vi-VN';
+      u.rate = (lang === 'en') ? 0.9 : 0.92; u.pitch = 1.05; u.voice = v;
       speechSynthesis.speak(u);
-    } catch (e) { }
+      return true;
+    } catch (e) { return false; }
   }
-  function speak(text) {
+  function speak(text, lang) {
     if (!soundOn) return;
-    const clean = sayText(text);
+    lang = (lang === 'en') ? 'en' : 'vi';
+    const clean = sayText(text, lang);
     if (!clean) return;
     stopSpeak();
-    const tok = sayTok, parts = ttsChunks(clean);
+    const tok = sayTok;
+    // Tiếng Anh: máy thường có sẵn giọng -> đọc thẳng (ổn định, chạy cả khi offline).
+    if (lang === 'en' && speakLocal(clean, 'en')) return;
+    // Còn lại: Google TTS đúng ngôn ngữ; lỗi thì mới dùng giọng máy (nếu có).
+    const parts = ttsChunks(clean);
     let i = 0, fellBack = false, tries = 0;
     function fallback() {
       if (fellBack || tok !== sayTok) return;
       fellBack = true; curAudio = null;
-      speakLocal(parts.slice(i).join(' '));   // đọc nốt phần còn lại (chỉ khi có giọng tiếng Việt)
+      speakLocal(parts.slice(i).join(' '), lang);   // giọng máy đúng ngôn ngữ (nếu có), không thì im lặng
     }
     function next() {
       if (tok !== sayTok) return;
       if (i >= parts.length) { curAudio = null; return; }
-      const a = new Audio(gttsUrl(parts[i]));
+      const a = new Audio(gttsUrl(parts[i], lang));
       curAudio = a;
       let done = false;
       a.onended = () => { if (done) return; done = true; if (tok === sayTok) { tries = 0; i++; next(); } };
@@ -132,11 +153,11 @@ const Game = (() => {
         if (done) return; done = true;
         if (tok !== sayTok) return;
         if (tries++ < 1) next();               // thử lại đoạn này 1 lần (lỗi mạng tạm thời)
-        else fallback();                       // vẫn lỗi -> giọng tiếng Việt của máy (nếu có), không thì im lặng
+        else fallback();                       // vẫn lỗi -> giọng máy đúng ngôn ngữ (nếu có), không thì im lặng
       };
       a.onerror = onFail;
       const p = a.play();
-      if (p && p.catch) p.catch(onFail);       // autoplay bị chặn -> thử lại / giọng máy tiếng Việt
+      if (p && p.catch) p.catch(onFail);       // autoplay bị chặn -> thử lại / giọng máy
     }
     next();
   }
@@ -249,14 +270,15 @@ const Game = (() => {
   const feedbackLayer = () => document.getElementById('feedback');
   const GOOD_WORDS = ['Giỏi quá!', 'Đúng rồi!', 'Tuyệt vời!', 'Xuất sắc!', 'Hay lắm!', 'Chính xác!', 'Bé thông minh ghê!'];
   const BAD_WORDS = ['Gần đúng rồi!', 'Thử lại nhé!', 'Ơ, chưa đúng!', 'Cố lên nào!'];
-  function toast(good) {
+  function toast(good, sayOverride, sayLang) {
     const layer = feedbackLayer(); if (!layer) return;
     const word = good ? pick(GOOD_WORDS) : pick(BAD_WORDS);
     const t = el('div', 'toast ' + (good ? 'good' : 'bad'));
     t.innerHTML = `<span class="face">${good ? '🎉' : '💪'}</span>${word}`;
     layer.appendChild(t);
     good ? sfx.good() : sfx.bad();
-    speak(word);
+    // Bài tiếng Anh: khi đúng thì đọc lại TỪ TIẾNG ANH cho bé nghe (thay lời khen).
+    if (sayOverride) speak(sayOverride, sayLang || 'en'); else speak(word);
     setTimeout(() => t.remove(), 1100);
   }
   function confetti() {
@@ -300,13 +322,14 @@ const Game = (() => {
     const body = $('playBody'); body.innerHTML = '';
 
     // câu dẫn (có nút loa). q.say (nếu có) = câu đọc riêng, dễ nghe hơn q.prompt
+    // q.lang = 'en' -> đọc bằng tiếng Anh; q.noSpeak -> không tự đọc (bấm loa mới đọc)
     const spoken = q.say != null ? q.say : q.prompt;
-    s.spoken = spoken;
+    s.spoken = spoken; s.spokenLang = q.lang || 'vi';
     const p = el('div', 'prompt');
     p.innerHTML = `<span>${q.prompt}</span><span class="say" title="Nghe">🔊</span>`;
-    p.querySelector('.say').onclick = () => speak(spoken);
+    p.querySelector('.say').onclick = () => speak(spoken, s.spokenLang);
     body.appendChild(p);
-    speak(spoken);
+    if (!q.noSpeak) speak(spoken, s.spokenLang);
 
     const host = el('div'); host.style.flex = '1'; body.appendChild(host);
     RENDERERS[q.type](q, host);
@@ -320,7 +343,7 @@ const Game = (() => {
     const srcId = (q && q._srcId) || (s.lesson && s.lesson.id);
     if (ok) {
       if (s.firstTry) { s.correct++; if (window.Store && srcId) Store.easeMiss(srcId); }
-      toast(true);
+      toast(true, q.sayCorrect, q.sayCorrectLang || 'en');
       setTimeout(() => {
         s.idx++;
         renderStars(s.questions.length, s.idx);
@@ -784,7 +807,7 @@ const Game = (() => {
     setSound(on) { soundOn = on; if (!on) stopSpeak(); },
     getSound() { return soundOn; },
     speak, stopSpeak, sfx,
-    replay() { if (session && session.spoken != null) speak(session.spoken); },
+    replay() { if (session && session.spoken != null) speak(session.spoken, session.spokenLang); },
     _answered: answered
   };
 })();

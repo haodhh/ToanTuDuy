@@ -1,35 +1,57 @@
-# 🐼 Toán Tư Duy cùng Gấu KIKI
+# 🐼 Học Vui cùng Bé Yêu
 
-Trang web trò chơi học toán tư duy cho bé chuẩn bị vào lớp 1, chuyển thể từ cuốn
-**“Phiếu luyện Toán tư duy cùng Gấu KIKI 3 – Xác định vị trí & Các dạng toán quy luật”**
-(tác giả Trần Thị Hường – MegaBook).
+### 👉 Chơi ngay tại: **https://haodhh.github.io/ToanTuDuy/**
 
-Thay vì viết vào sách chỉ chơi được **một lần**, bé có thể vào chơi **lại bao nhiêu lần cũng được** —
+Trang web trò chơi học tập cho bé, gồm **2 mục học** chọn ngay trên thanh menu:
+
+- 🧠 **Toán tư duy** — luyện toán tư duy cho bé chuẩn bị vào lớp 1.
+- 🔤 **Tiếng Anh cho bé** — học từ vựng tiếng Anh theo **từng lớp** (Lớp 1–5).
+
+Thay vì làm bài trong sách chỉ chơi được **một lần**, bé vào chơi **lại bao nhiêu lần cũng được** —
 mỗi lần chơi câu hỏi lại được **tạo ngẫu nhiên mới**. 🎉
 
-## ✨ Bé được học gì?
+## 🧠 Mục Toán tư duy
 
-- **20 bài học** dựng lại theo đúng sách, chia 2 phần:
-  - *Phần 1 – Xác định vị trí:* trên/dưới/giữa, trái/phải, trong/ngoài, xa/gần, to/nhỏ, cao/thấp, dài/ngắn, phương hướng, thống kê số liệu.
-  - *Phần 2 – Toán quy luật:* quy luật màu sắc, hình khối, thứ tự, đối chiếu hình, tìm vật xuất hiện 1 lần, tìm hình giống hệt, hình liên quan, tìm bóng, tìm điểm khác biệt, tìm điểm không hợp lí, ôn tập.
-- Bài 1–12 và 16 giữ **đúng nội dung như sách** (câu hỏi, đáp án, thứ tự). Các bài tìm/nối/khác biệt còn lại dùng **đúng dạng bài** với nội dung tạo mới mỗi lần → **chơi lại không nhàm chán**.
+Chuyển thể từ bộ **“Phiếu luyện Toán tư duy cùng Gấu KIKI”** (tác giả Trần Thị Hường – MegaBook),
+chia thành nhiều **tập sách**:
+
+- *Xác định vị trí:* trên/dưới/giữa, trái/phải, trong/ngoài, xa/gần, to/nhỏ, cao/thấp, dài/ngắn, phương hướng, thống kê số liệu.
+- *Toán quy luật:* quy luật màu sắc, hình khối, thứ tự, đối chiếu hình, tìm vật xuất hiện 1 lần, tìm hình giống hệt, tìm bóng, tìm điểm khác biệt…
+- *Số lượng & phép tính:* nhận biết số, đếm, tách – gộp, so sánh, làm quen phép cộng/trừ.
+- Có phần **Ôn tập** tự tạo câu mới và **luyện lại phần bé hay sai**.
+
+Nhiều bài giữ **đúng nội dung như sách**; các bài còn lại dùng **đúng dạng bài** với nội dung tạo mới mỗi lần → chơi lại không nhàm chán.
+
+## 🔤 Mục Tiếng Anh cho bé
+
+Từ vựng bám theo **sách giáo khoa tiếng Anh tiểu học của Bộ GD&ĐT** (bộ Global Success), chia theo **Lớp 1 → Lớp 5**.
+Mỗi lớp gồm nhiều **chủ đề** quen thuộc (chào hỏi, màu sắc, số đếm, gia đình, con vật, đồ ăn, trường lớp, nghề nghiệp…).
+
+Mỗi bài tự sinh nhiều kiểu chơi vui nhộn:
+
+- **Nghe rồi chọn hình / chọn từ** đúng.
+- **Xem hình chọn từ tiếng Anh**, **đọc từ chọn hình**.
+- **Nối hình với từ**, **nối từ tiếng Anh với nghĩa tiếng Việt**.
+
+👉 Từ tiếng Anh được **phát âm bằng giọng tiếng Anh**; câu hướng dẫn vẫn bằng tiếng Việt để bé dễ hiểu.
 
 ## 🎮 Cách chơi
 
-1. Mở trang web, chọn **bài học** bé muốn chơi từ menu.
-2. Nghe câu hỏi (có **giọng đọc tiếng Việt** nếu thiết bị hỗ trợ) và chạm vào đáp án đúng.
-3. Trả lời đúng sẽ có **âm thanh vui nhộn**, ngôi sao thưởng ⭐ và pháo giấy 🎊 khi hoàn thành bài.
-4. Số sao của bé được **lưu lại** để lần sau chơi tiếp.
+1. Chọn mục **Toán tư duy** hoặc **Tiếng Anh cho bé** trên thanh menu ở đầu trang.
+2. Chọn **tập sách / lớp**, rồi chọn **bài học** bé muốn chơi.
+3. Nghe câu hỏi và chạm vào đáp án đúng.
+4. Trả lời đúng sẽ có **âm thanh vui nhộn**, ngôi sao thưởng ⭐ và pháo giấy 🎊 khi hoàn thành bài.
+5. Số sao của bé được **lưu lại** để lần sau chơi tiếp.
 
 ## 💡 Điểm hay cho bé
 
-- **Giọng đọc tiếng Việt** đọc câu hỏi, bé chưa biết đọc vẫn chơi được.
+- **Giọng đọc song ngữ:** đọc tiếng Việt cho bài toán, đọc **tiếng Anh** cho từ vựng — bé chưa biết đọc vẫn chơi được.
+- **Nhiều hồ sơ:** mỗi bé một hồ sơ riêng, sao và tiến trình lưu tách biệt; có **sao lưu / khôi phục** bằng file.
 - **Âm thanh & phần thưởng** khích lệ bé mỗi khi làm đúng.
-- **Lưu kết quả** số sao của bé để theo dõi tiến bộ.
 - Nút bấm **to, dễ chạm** — phù hợp cả **điện thoại, máy tính bảng và máy tính**.
-- Chơi được **offline**, không cần mạng.
+- Chơi được **offline** (phần đọc tiếng Anh dùng giọng có sẵn của máy nên vẫn nghe được khi không có mạng).
 
 ## 📝 Ghi chú
 
-Toàn bộ hình ảnh trong web dùng **emoji và hình khối tự vẽ**, **không** sao chép tranh
-minh hoạ trong sách. Nội dung học tập dựa theo *dạng bài* của sách để bé luyện tập lại.
+Toàn bộ hình ảnh trong web dùng **emoji và hình khối tự vẽ**, **không** sao chép tranh minh hoạ trong sách.
+Nội dung học tập dựa theo *dạng bài* và *chủ đề* của sách để bé luyện tập lại.

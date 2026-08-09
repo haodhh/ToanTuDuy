@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#ff9800" />
-  <title>Toán Tư Duy cùng Gấu KIKI</title>
+  <title>Học Vui cùng Bé Yêu</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐼</text></svg>" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
@@ -12,22 +12,28 @@
   <!-- MÀN HÌNH CHÍNH -->
   <div id="screen-menu" class="screen active">
     <header class="app-header">
-      <button class="menu-btn" id="menuToggle" aria-label="Chọn tập sách">☰</button>
-      <div class="mascot-wrap" id="menuMascot"></div>
-      <div class="title-wrap">
-        <h1>Toán Tư Duy</h1>
-        <p>cùng Gấu KIKI 🐼</p>
+      <div class="app-header-top">
+        <button class="menu-btn" id="menuToggle" aria-label="Chọn mục học">☰</button>
+        <div class="mascot-wrap" id="menuMascot"></div>
+        <div class="title-wrap">
+          <h1>Học Vui cùng Bé Yêu</h1>
+          <p id="appSubtitle">Toán tư duy cùng Gấu KIKI 🐼</p>
+        </div>
+        <button class="profile-btn" id="profileBtn" title="Hồ sơ học tập" aria-label="Hồ sơ học tập">
+          <span class="pf-emoji" id="pfEmoji">🐼</span>
+          <span class="pf-name" id="pfName">Bé yêu</span>
+        </button>
+        <button class="sound-toggle" id="soundToggle" title="Bật/tắt âm thanh">🔊</button>
       </div>
-      <button class="profile-btn" id="profileBtn" title="Hồ sơ học tập" aria-label="Hồ sơ học tập">
-        <span class="pf-emoji" id="pfEmoji">🐼</span>
-        <span class="pf-name" id="pfName">Bé yêu</span>
-      </button>
-      <button class="sound-toggle" id="soundToggle" title="Bật/tắt âm thanh">🔊</button>
+      <nav class="subject-tabs" id="subjectTabs" aria-label="Chọn mục học">
+        <button class="subject-tab active" id="tabMath" data-sub="math"><span class="st-ic">🧠</span> Toán tư duy</button>
+        <button class="subject-tab" id="tabEn" data-sub="en"><span class="st-ic">🔤</span> Tiếng Anh cho bé</button>
+      </nav>
     </header>
 
     <div class="menu-layout">
-      <aside class="sidebar" id="sidebar" aria-label="Chọn tập sách">
-        <div class="sidebar-title">📚 Chọn tập sách</div>
+      <aside class="sidebar" id="sidebar" aria-label="Chọn mục học">
+        <div class="sidebar-title" id="sidebarTitle">📚 Chọn tập sách</div>
         <div id="volList"></div>
       </aside>
       <div class="scrim" id="scrim"></div>
@@ -68,6 +74,8 @@
   <script src="js/lessons.js"></script>
   <script src="js/lessons-t4.js"></script>
   <script src="js/lessons-t5.js"></script>
+  <script src="js/english-data.js"></script>
+  <script src="js/english.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

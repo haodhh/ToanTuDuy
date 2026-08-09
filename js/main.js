@@ -6,7 +6,16 @@
 (function () {
   'use strict';
   const $ = (id) => document.getElementById(id);
-  const VOLUMES = [VOL_T1, VOL_T2, VOL_T3, VOL_T4, VOL_T5];
+  // Hai MÔN học: Toán tư duy (các tập sách) và Tiếng Anh cho bé (theo từng lớp)
+  const MATH_VOLUMES = [VOL_T1, VOL_T2, VOL_T3, VOL_T4, VOL_T5];
+  const EN_VOLUMES = (window.EN_VOLUMES || []);
+  const ALL_VOLUMES = MATH_VOLUMES.concat(EN_VOLUMES);
+  const SUBJECTS = {
+    math: { volumes: MATH_VOLUMES, sidebarTitle: '📚 Chọn tập sách', subtitle: 'Toán tư duy cùng Gấu KIKI 🐼' },
+    en: { volumes: EN_VOLUMES, sidebarTitle: '🎒 Chọn lớp học', subtitle: 'Tiếng Anh cho bé theo từng lớp 🔤' }
+  };
+  let currentSubject = 'math';
+  const subjectVolumes = () => SUBJECTS[currentSubject].volumes;
 
   /* ---- PHẦN 3: ÔN TẬP (tự dựng cho mỗi tập) ----
      1) "Ôn tập bài đã học": lấy ngẫu nhiên 10 câu từ các bài ĐÃ HỌC (câu thật).
@@ -69,12 +78,15 @@
     vol.lessons.push({ part: 3, num: maxNum + 2, emoji: '🎯', title: 'Kiểm tra đánh giá', id: vol.id + '-rv2', build: () => reviewNew(base, REV_N) });
     vol.lessons.push({ part: 3, num: maxNum + 3, emoji: '💪', title: 'Luyện phần hay sai', id: vol.id + '-rv3', build: () => reviewWeak(base, REV_N) });
   }
-  VOLUMES.forEach(addReviewPart);
+  ALL_VOLUMES.forEach(addReviewPart);
 
-  // mở lại đúng tập bé đang học dở
-  let currentVol = VOLUMES[0];
+  // mở lại đúng tập/lớp bé đang học dở (nhận biết cả môn Toán và Tiếng Anh)
+  let currentVol = MATH_VOLUMES[0];
   const _last0 = Store.getLast();
-  if (_last0) { const v = VOLUMES.find(x => x.id === _last0.vol); if (v) currentVol = v; }
+  if (_last0) {
+    const v = ALL_VOLUMES.find(x => x.id === _last0.vol);
+    if (v) { currentVol = v; currentSubject = EN_VOLUMES.indexOf(v) >= 0 ? 'en' : 'math'; }
+  }
 
   $('menuMascot').innerHTML = Game.pandaSVG();
 
@@ -97,9 +109,10 @@
 
   /* ---- sidebar chọn tập ---- */
   function buildSidebar() {
+    $('sidebarTitle').textContent = SUBJECTS[currentSubject].sidebarTitle;
     const wrap = $('volList'); wrap.innerHTML = '';
     const stars = Game.loadAllStars();
-    VOLUMES.forEach(v => {
+    subjectVolumes().forEach(v => {
       const core = v.lessons.filter(l => l.part !== 3);      // không tính phần ôn tập
       const done = core.filter(l => stars[l.id]).length;
       const card = document.createElement('button');
@@ -120,9 +133,32 @@
     $('menuBody').scrollTop = 0;
   }
 
+  /* ---- chuyển MÔN học (Toán tư duy / Tiếng Anh) ---- */
+  function updateTabs() {
+    document.querySelectorAll('.subject-tab').forEach(b => b.classList.toggle('active', b.dataset.sub === currentSubject));
+    const st = $('appSubtitle'); if (st) st.textContent = SUBJECTS[currentSubject].subtitle;
+  }
+  function setSubject(sub) {
+    if (!SUBJECTS[sub] || sub === currentSubject) return;
+    currentSubject = sub;
+    currentVol = subjectVolumes()[0] || null;
+    updateTabs();
+    buildSidebar();
+    buildMenu();
+    $('menuBody').scrollTop = 0;
+    closeDrawer();
+  }
+  document.querySelectorAll('.subject-tab').forEach(b => {
+    b.onclick = () => { Game.sfx.click(); setSubject(b.dataset.sub); };
+  });
+
   /* ---- lưới bài học của tập hiện tại ---- */
   function buildMenu() {
     const body = $('menuBody'); body.innerHTML = '';
+    if (!currentVol) {   // môn chưa có nội dung
+      body.innerHTML = '<div class="vol-head"><h2>Sắp có nội dung 🌟</h2><p>Nội dung mục này đang được cập nhật.</p></div>';
+      return;
+    }
     const head = document.createElement('div');
     head.className = 'vol-head';
     head.innerHTML = `<h2>${currentVol.emoji} ${currentVol.name}</h2><p>${currentVol.subtitle}</p>`;
@@ -371,6 +407,7 @@
 
   /* ---- khởi động ---- */
   updateProfileChip();
+  updateTabs();
   buildSidebar();
   buildMenu();
 })();
