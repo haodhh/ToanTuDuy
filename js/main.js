@@ -39,17 +39,25 @@
     }
     return qs.slice(0, n);
   }
+  const freshQ = (l) => { try { const b = l.build(); if (b.length) return tag(Game.pick(b), l.id); } catch (e) { } return null; };
   // Luyện các bài bé HAY SAI: ưu tiên bài có điểm sai cao, tự sinh câu mới
   function reviewWeak(base, n) {
     const miss = (window.Store && Store.getMiss) ? Store.getMiss() : {};
-    let pool = base.filter(l => (miss[l.id] || 0) > 0).sort((a, b) => (miss[b.id] || 0) - (miss[a.id] || 0));
-    if (!pool.length) pool = reviewPool(base);       // chưa có lỗi -> ôn các bài đã học
+    const weak = base.filter(l => (miss[l.id] || 0) > 0).sort((a, b) => (miss[b.id] || 0) - (miss[a.id] || 0));
     const qs = [];
-    let i = 0, guard = 0;
-    while (qs.length < n && guard++ < n * 5) {
-      const l = pool[i % pool.length]; i++;          // xoay vòng theo thứ tự sai nhiều -> ít
-      try { const b = l.build(); if (b.length) qs.push(tag(Game.pick(b), l.id)); } catch (e) { }
+    if (!weak.length) {                              // chưa có lỗi -> xoay vòng các bài đã học
+      const pool = reviewPool(base);
+      let i = 0, g = 0;
+      while (qs.length < n && g++ < n * 5) { const q = freshQ(pool[i++ % pool.length]); if (q) qs.push(q); }
+      return qs.slice(0, n);
     }
+    // pass 1: mỗi bài yếu ít nhất 1 câu (bài sai nhiều xếp trước)
+    for (const l of weak) { if (qs.length >= n) break; const q = freshQ(l); if (q) qs.push(q); }
+    // pass 2: lấp phần còn lại theo TRỌNG SỐ điểm sai (bài càng hay sai càng xuất hiện nhiều)
+    const bag = [];
+    weak.forEach(l => { for (let k = 0; k < (miss[l.id] || 1); k++) bag.push(l); });
+    let g = 0;
+    while (qs.length < n && g++ < n * 6) { const q = freshQ(Game.pick(bag)); if (q) qs.push(q); }
     return qs.slice(0, n);
   }
   function addReviewPart(vol) {
