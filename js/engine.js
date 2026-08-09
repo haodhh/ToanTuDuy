@@ -79,6 +79,9 @@ const Game = (() => {
     else if (shape === 'square') inner = `<rect x="4" y="4" width="${s - 8}" height="${s - 8}" rx="6" fill="${c}"/>`;
     else if (shape === 'triangle') inner = `<polygon points="${m},4 ${s - 4},${s - 5} 4,${s - 5}" fill="${c}"/>`;
     else if (shape === 'diamond') inner = `<polygon points="${m},3 ${s - 3},${m} ${m},${s - 3} 3,${m}" fill="${c}"/>`;
+    else if (shape === 'rectangle') inner = `<rect x="3" y="${s * 0.26}" width="${s - 6}" height="${s * 0.48}" rx="4" fill="${c}"/>`;
+    else if (shape === 'oval') inner = `<ellipse cx="${m}" cy="${m}" rx="${m - 3}" ry="${(m - 3) * 0.66}" fill="${c}"/>`;
+    else if (shape === 'trapezoid') inner = `<polygon points="${s * 0.22},${s * 0.28} ${s * 0.78},${s * 0.28} ${s - 4},${s * 0.74} 4,${s * 0.74}" fill="${c}"/>`;
     else if (shape === 'hexagon') { const r = m - 3; let p = []; for (let i = 0; i < 6; i++) { const a = Math.PI / 6 + i * Math.PI / 3; p.push((m + r * Math.cos(a)).toFixed(1) + ',' + (m + r * Math.sin(a)).toFixed(1)); } inner = `<polygon points="${p.join(' ')}" fill="${c}"/>`; }
     else if (shape === 'cross') inner = `<path d="M${m - 6} 5 h12 v${m - 11} h${m - 11} v12 h-${m - 11} v${m - 11} h-12 v-${m - 11} h-${m - 11} v-12 h${m - 11} z" fill="${c}"/>`;
     else if (shape === 'star') {
@@ -377,19 +380,22 @@ const Game = (() => {
 
   /* --- 4) Đếm số lượng --- */
   RENDERERS.count = (q, host) => {
-    const scene = el('div', 'count-scene');
-    // rải vật ngẫu nhiên không chồng nhau (đơn giản: lưới lệch)
-    const n = q.items.length;
-    const positions = scatter(n);
-    q.items.forEach((g, i) => {
-      const s = el('span', 'cem');
-      s.style.left = positions[i].x + '%';
-      s.style.top = positions[i].y + '%';
-      s.style.fontSize = (q.emSize || 40) + 'px';
-      s.innerHTML = glyph(g, q.emSize || 40);
-      scene.appendChild(s);
-    });
-    host.appendChild(scene);
+    if (q.sceneHTML) {
+      const sc = el('div', 'scene'); sc.innerHTML = q.sceneHTML; host.appendChild(sc);
+    } else {
+      const scene = el('div', 'count-scene');
+      const n = q.items.length;
+      const positions = scatter(n);
+      q.items.forEach((g, i) => {
+        const s = el('span', 'cem');
+        s.style.left = positions[i].x + '%';
+        s.style.top = positions[i].y + '%';
+        s.style.fontSize = (q.emSize || 40) + 'px';
+        s.innerHTML = glyph(g, q.emSize || 40);
+        scene.appendChild(s);
+      });
+      host.appendChild(scene);
+    }
     const box = el('div', 'options cols-' + Math.min(q.options.length, 4));
     shuffle(q.options).forEach(val => {
       const b = el('div', 'opt');

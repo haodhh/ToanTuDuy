@@ -5,7 +5,7 @@
 (function () {
   'use strict';
   const $ = (id) => document.getElementById(id);
-  const VOLUMES = [VOL_T3, VOL_T4];
+  const VOLUMES = [VOL_T1, VOL_T2, VOL_T3, VOL_T4, VOL_T5];
   let currentVol = VOLUMES[0];
 
   $('menuMascot').innerHTML = Game.pandaSVG();

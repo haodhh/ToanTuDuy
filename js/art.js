@@ -139,6 +139,37 @@ window.Art = (() => {
       <text x="${w / 2}" y="${h - 8}" font-size="8" text-anchor="middle" fill="#555" font-family="sans-serif">44</text>`);
   }
 
+  /* ---- id duy nhất cho clipPath ---- */
+  let _id = 0; const nid = () => 'art' + (++_id);
+
+  /* ---- BÌNH CÁ / LỌ có mức nước (đầy – rỗng) ---- */
+  function bowl(fill = 1, w = 108) {
+    const h = w, cx = w / 2, cy = h * 0.56, rx = w * 0.44, ry = h * 0.42;
+    const id = nid();
+    const top = cy - ry, waterTop = cy + ry - (2 * ry) * Math.max(0, Math.min(1, fill));
+    return wrap(w, h, `
+      <defs><clipPath id="${id}"><ellipse cx="${cx}" cy="${cy}" rx="${rx - 3}" ry="${ry - 3}"/></clipPath></defs>
+      <rect x="${cx - rx * 0.5}" y="${top - 6}" width="${rx}" height="8" rx="4" fill="#cfeaf7"/>
+      <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="#eaf7ff" stroke="#7fb9d6" stroke-width="3"/>
+      <rect x="0" y="${waterTop}" width="${w}" height="${h}" fill="#6fd0f5" opacity=".7" clip-path="url(#${id})"/>
+      <ellipse cx="${cx - rx * 0.35}" cy="${cy - ry * 0.4}" rx="${rx * 0.18}" ry="${ry * 0.28}" fill="#fff" opacity=".55"/>`);
+  }
+  /* ---- LỌ THUỶ TINH có mức chứa ---- */
+  function jarFill(fill = 1, w = 88) {
+    const h = w * 1.25, id = nid();
+    const bx = w * 0.16, bw = w * 0.68, bodyTop = h * 0.2, bodyH = h * 0.72;
+    const contentTop = bodyTop + bodyH - bodyH * Math.max(0, Math.min(1, fill));
+    return wrap(w, h, `
+      <defs><clipPath id="${id}"><rect x="${bx + 2}" y="${bodyTop + 2}" width="${bw - 4}" height="${bodyH - 4}" rx="10"/></clipPath></defs>
+      <rect x="${w * 0.3}" y="4" width="${w * 0.4}" height="${h * 0.09}" rx="3" fill="#c8a24a"/>
+      <rect x="${bx}" y="${bodyTop}" width="${bw}" height="${bodyH}" rx="12" fill="#eef7fb" stroke="#9cc6da" stroke-width="3"/>
+      <rect x="0" y="${contentTop}" width="${w}" height="${h}" fill="#f6c945" opacity=".85" clip-path="url(#${id})"/>`);
+  }
+  /* ---- THẺ SỐ to (số 0–10) ---- */
+  function numCard(n, color = '#1e88e5', size = 60) {
+    return `<span style="display:inline-flex;align-items:center;justify-content:center;width:${size}px;height:${size}px;border-radius:16px;background:${color};color:#fff;font-size:${Math.round(size * 0.58)}px;font-weight:900;box-shadow:0 4px 0 rgba(0,0,0,.16);font-family:inherit">${n}</span>`;
+  }
+
   /* ---- Ô VUÔNG 2x2 NHIỀU MÀU (quy luật màu sắc) ---- */
   const QC = { red: '#e53935', orange: '#fb8c00', yellow: '#fdd835', green: '#43a047', blue: '#1e88e5', purple: '#8e24aa', pink: '#ec407a', teal: '#00acc1' };
   function quad(tl, tr, bl, br, s = 50) {
@@ -146,5 +177,43 @@ window.Art = (() => {
     return wrap(s, s, `<rect x="0" y="0" width="${h}" height="${h}" fill="${c(tl)}"/><rect x="${h}" y="0" width="${h}" height="${h}" fill="${c(tr)}"/><rect x="0" y="${h}" width="${h}" height="${h}" fill="${c(bl)}"/><rect x="${h}" y="${h}" width="${h}" height="${h}" fill="${c(br)}"/><rect x="0" y="0" width="${s}" height="${s}" fill="none" stroke="#fff" stroke-width="2"/>`);
   }
 
-  return { wrap, pencil, crayon, ruler, path, snake, tree, shelf, fence, nest, box, house, stamp, quad };
+  /* ---- KHỐI 3D (lập phương, hộp, cầu, trụ, nón) ---- */
+  function solid(kind, color = 'purple', w = 78) {
+    const c = QC[color] || color, dark = shade(c, -28), light = shade(c, 18), h = w;
+    if (kind === 'cube' || kind === 'cuboid') {
+      const bw = kind === 'cube' ? w * 0.62 : w * 0.8, bh = w * 0.55, d = w * 0.22, x = (w - bw) / 2, y = h - bh - 6;
+      return wrap(w, h, `
+        <polygon points="${x},${y} ${x + d},${y - d} ${x + bw + d},${y - d} ${x + bw},${y}" fill="${light}"/>
+        <polygon points="${x + bw},${y} ${x + bw + d},${y - d} ${x + bw + d},${y + bh - d} ${x + bw},${y + bh}" fill="${dark}"/>
+        <rect x="${x}" y="${y}" width="${bw}" height="${bh}" fill="${c}"/>`);
+    }
+    if (kind === 'sphere') {
+      const id = nid();
+      return wrap(w, h, `<defs><radialGradient id="${id}" cx="38%" cy="34%" r="70%"><stop offset="0%" stop-color="${light}"/><stop offset="100%" stop-color="${dark}"/></radialGradient></defs>
+        <circle cx="${w / 2}" cy="${h / 2}" r="${w * 0.42}" fill="url(#${id})"/>`);
+    }
+    if (kind === 'cylinder') {
+      const bw = w * 0.56, x = (w - bw) / 2, ey = w * 0.12, top = w * 0.16, bot = h * 0.86;
+      return wrap(w, h, `
+        <rect x="${x}" y="${top}" width="${bw}" height="${bot - top}" fill="${c}"/>
+        <ellipse cx="${w / 2}" cy="${bot}" rx="${bw / 2}" ry="${ey}" fill="${dark}"/>
+        <rect x="${x}" y="${top}" width="${bw / 3}" height="${bot - top}" fill="${light}" opacity=".35"/>
+        <ellipse cx="${w / 2}" cy="${top}" rx="${bw / 2}" ry="${ey}" fill="${light}"/>`);
+    }
+    if (kind === 'cone') {
+      const bw = w * 0.6, x = (w - bw) / 2, bot = h * 0.82, ey = w * 0.11;
+      return wrap(w, h, `
+        <polygon points="${w / 2},${w * 0.12} ${x},${bot} ${x + bw},${bot}" fill="${c}"/>
+        <polygon points="${w / 2},${w * 0.12} ${x},${bot} ${w / 2},${bot}" fill="${light}" opacity=".4"/>
+        <ellipse cx="${w / 2}" cy="${bot}" rx="${bw / 2}" ry="${ey}" fill="${dark}"/>`);
+    }
+    return '';
+  }
+  function shade(hex, amt) {
+    const n = parseInt(hex.slice(1), 16); let r = (n >> 16) + amt, g = ((n >> 8) & 255) + amt, b = (n & 255) + amt;
+    r = Math.max(0, Math.min(255, r)); g = Math.max(0, Math.min(255, g)); b = Math.max(0, Math.min(255, b));
+    return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+  }
+
+  return { wrap, pencil, crayon, ruler, path, snake, tree, shelf, fence, nest, box, house, stamp, quad, bowl, jarFill, numCard, solid };
 })();
